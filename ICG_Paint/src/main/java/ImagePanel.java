@@ -1,5 +1,3 @@
-package ru.nsu.fit.g18200.rylov.testproject;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -8,78 +6,60 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-
 import javax.swing.JPanel;
 
-public class ImagePanel extends JPanel implements MouseListener
-{
+public class ImagePanel extends JPanel implements MouseListener {
 	private boolean draw = true;
-	private int x, y, xd=-1, yd=-1;
+	private int x, y, xd = -1, yd = -1;
 	private BufferedImage img;
-	
-	public ImagePanel()
-	{
+
+	private ColorHolder colorHolder; // РћР±СЉРµРєС‚ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ С‚РµРєСѓС‰РµРіРѕ С†РІРµС‚Р°
+
+	public ImagePanel(ColorHolder colorHolder) {
+		this.colorHolder = colorHolder; // РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ colorHolder
 		addMouseListener(this);
-		
-		addMouseMotionListener(new MouseAdapter()
-		{
+
+		addMouseMotionListener(new MouseAdapter() {
 			@Override
-			public void mouseDragged(MouseEvent e)
-			{
-				if (xd >= 0)
-				{
+			public void mouseDragged(MouseEvent e) {
+				// РџСЂРѕРёР·РІРѕР»СЊРЅР°СЏ Р»РёРЅРёСЏ (Р»СЋР±РѕР№ С„РѕСЂРјС‹)
+				if (xd >= 0) {
 					Graphics g = getGraphics();
-					g.setColor(Color.blue);
+					g.setColor(colorHolder.getCurrentColor()); // РСЃРїРѕР»СЊР·СѓРµРј С‚РµРєСѓС‰РёР№ С†РІРµС‚
 					g.drawLine(xd, yd, e.getX(), e.getY());
 				}
-				
+
 				xd = e.getX();
 				yd = e.getY();
 			}
 		});
 	}
-	
+
 	@Override
-	public void paintComponent(Graphics g)
-	{
+	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		
-		if (draw)
-		{
+
+		if (draw) {
 			Graphics2D g2 = (Graphics2D) g;
 			g2.setColor(Color.RED);
 			g2.setStroke(new BasicStroke(4));
-			g2.drawLine(0, 0, getWidth()-1, getHeight()-1);
-			
-			
-			// Работа с изображением (BufferedImage)
-			/*
-			 * Получить цвет пикселя:
-			 * int color = img.getRGB(x, y);
-			 * Задать цвет пикселя:
-			 * img.setRGB(x, y, Color.GREEN.getRGB());
-			 * Подготовка изображения должна проводиться в другом методе, который будет вызывать repaint();
-			 * 
-			 * В paintComponent() в итоге просто отрисовывается обработанное изображение:
-			 * g2.drawImage(img, x, y, getWidth(), getHeight(), null);
-			*/
+			g2.drawLine(0, 0, getWidth() - 1, getHeight() - 1);
 		}
 	}
-	
-	public void clean()
-	{
+
+	public void clean() {
 		draw = !draw;
 		repaint();
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent ev) { }
+	public void mouseClicked(MouseEvent ev) {}
 
 	@Override
-	public void mouseEntered(MouseEvent ev) { }
+	public void mouseEntered(MouseEvent ev) {}
 
 	@Override
-	public void mouseExited(MouseEvent ev) { }
+	public void mouseExited(MouseEvent ev) {}
 
 	@Override
 	public void mousePressed(MouseEvent ev) {
@@ -89,7 +69,9 @@ public class ImagePanel extends JPanel implements MouseListener
 
 	@Override
 	public void mouseReleased(MouseEvent ev) {
-		getGraphics().drawLine(x, y, ev.getX(), ev.getY());
+		Graphics g = getGraphics();
+		g.setColor(colorHolder.getCurrentColor()); // РСЃРїРѕР»СЊР·СѓРµРј С‚РµРєСѓС‰РёР№ С†РІРµС‚
+		g.drawLine(x, y, ev.getX(), ev.getY());
 		xd = -1;
 		yd = -1;
 	}
