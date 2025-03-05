@@ -34,14 +34,14 @@ public class ToolBarMenu extends JToolBar {
         this.add(wavedLineBtn);
 
         // Кнопка для заливки
-        JButton fillBtn = new JButton("filling");
+        JButton fillBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("filling_icon.jpg"))));
         fillBtn.setPreferredSize(new Dimension(btnSize, btnSize));
         fillBtn.setMinimumSize(new Dimension(btnSize, btnSize));
         fillBtn.setMaximumSize(new Dimension(btnSize, btnSize));
         this.add(fillBtn);
 
         // Кнопка для очистки
-        JButton clearBtn = new JButton("clear");
+        JButton clearBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("clear_icon.jpg"))));
         clearBtn.setPreferredSize(new Dimension(btnSize, btnSize));
         clearBtn.setMinimumSize(new Dimension(btnSize, btnSize));
         clearBtn.setMaximumSize(new Dimension(btnSize, btnSize));
@@ -60,32 +60,7 @@ public class ToolBarMenu extends JToolBar {
         // настройки для штампов
         JPanel patternsGrid = new JPanel();
         patternsGrid.setLayout(new BoxLayout(patternsGrid, BoxLayout.X_AXIS));
-
-        JButton triangleBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("triangle_icon.jpg"))));
-        setSizeBtn(triangleBtn);
-        triangleBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Открываем диалог выбора
-                JFrame triangleFrame = new JFrame("Choose triangle settings");
-                triangleFrame.setPreferredSize(new Dimension(minSelecterWidth, minSelecterHeight));
-                triangleFrame.setMinimumSize(new Dimension(minSelecterWidth, minSelecterHeight));
-                triangleFrame.setResizable(false);
-
-                //set window's position
-                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-                triangleFrame.setLocation((int)((screenSize.getWidth()-minSelecterWidth)/2),
-                        (int)((screenSize.getHeight()-minSelecterHeight)/2));
-
-
-                triangleFrame.pack();
-                triangleFrame.setVisible(true);
-                selectedSettings.setTrianglePatternMode(); // Обновляем цвет в ColorHolder
-
-            }
-        });
-        patternsGrid.add(triangleBtn);
-
+        createPatternsGrid(patternsGrid);
         this.add(patternsGrid);
 
 
@@ -140,9 +115,9 @@ public class ToolBarMenu extends JToolBar {
 
         // Кнопка для выбора произвольного цвета
         JButton colorSelectBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("palitra_icon.jpg"))));
-        colorSelectBtn.setPreferredSize(new Dimension(btnSize, btnSize));
-        colorSelectBtn.setMinimumSize(new Dimension(btnSize, btnSize));
-        colorSelectBtn.setMaximumSize(new Dimension(btnSize, btnSize));
+        colorSelectBtn.setPreferredSize(new Dimension(btnSize-20, btnSize-20));
+        colorSelectBtn.setMinimumSize(new Dimension(btnSize-20, btnSize-20));
+        colorSelectBtn.setMaximumSize(new Dimension(btnSize-20, btnSize-20));
         colorSelectBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -160,15 +135,60 @@ public class ToolBarMenu extends JToolBar {
                 }
             }
         });
-        colorSelectBtn.setPreferredSize(new Dimension(2 * btnSize, btnSize));
-        colorSelectBtn.setMinimumSize(new Dimension(2 * btnSize, btnSize));
-        colorSelectBtn.setMaximumSize(new Dimension(2 * btnSize, btnSize));
         this.add(colorSelectBtn);
+
+
+        JPanel widthsGrid = new JPanel();
+        widthsGrid.setLayout(new BoxLayout(colorsGrid, BoxLayout.Y_AXIS));
+        //JButton width
+        //this.add(widthsGrid);
 
         // Настройки панели инструментов
         this.setFloatable(false);
         this.setRollover(false);
         this.add(Box.createGlue());
+    }
+
+    private void createPatternsGrid(JPanel patternsGrid) {
+        JButton triangleBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("triangle_icon.jpg"))));
+        setSizeBtn(triangleBtn);
+        triangleBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Открываем диалог выбора
+                JFrame triangleFrame = new JFrame("Choose triangle settings");
+                setPatternsSettingsFrame(triangleFrame);
+
+                JLabel labelSize = new JLabel("Choose size:");
+                JSlider slider = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
+                triangleFrame.add(labelSize);
+                triangleFrame.add(slider);
+                //triangleFrame.add();
+
+                triangleFrame.pack();
+                triangleFrame.setVisible(true);
+                selectedSettings.setTrianglePatternMode(); // Обновляем цвет в ColorHolder
+
+            }
+        });
+        patternsGrid.add(triangleBtn);
+
+        JButton squareBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("square_icon.jpg"))));
+        setSizeBtn(squareBtn);
+        squareBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Открываем диалог выбора
+                JFrame squareFrame = new JFrame("Choose square settings");
+                setPatternsSettingsFrame(squareFrame);
+
+                squareFrame.pack();
+                squareFrame.setVisible(true);
+                selectedSettings.setSquarePatternMode(); // Обновляем цвет в ColorHolder
+
+            }
+        });
+        patternsGrid.add(squareBtn);
     }
 
     // Метод для создания цветной кнопки
@@ -190,5 +210,18 @@ public class ToolBarMenu extends JToolBar {
         btn.setMaximumSize(new Dimension(btnSize, btnSize ));
 
         return btn;
+    }
+
+    private JFrame setPatternsSettingsFrame(JFrame frame) {
+        frame.setPreferredSize(new Dimension(minSelecterWidth, minSelecterHeight));
+        frame.setMinimumSize(new Dimension(minSelecterWidth, minSelecterHeight));
+        frame.setResizable(false);
+
+        //set window's position
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setLocation((int)((screenSize.getWidth()-minSelecterWidth)/2),
+                (int)((screenSize.getHeight()-minSelecterHeight)/2));
+
+        return frame;
     }
 }

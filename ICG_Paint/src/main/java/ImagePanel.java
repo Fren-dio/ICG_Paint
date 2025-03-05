@@ -13,7 +13,11 @@ public class ImagePanel extends JPanel implements MouseListener {
 
 	int DEFAULT_TRIANGLE_SIZE = 200;
 
-	private final SelectedSettings selectedSettings;
+	private SelectedSettings selectedSettings;
+
+	public ImagePanel() {
+		super();
+	}
 
 	public ImagePanel(SelectedSettings selectedSettings) {
 		this.selectedSettings = selectedSettings;

@@ -15,7 +15,7 @@ public class FrameWork extends JFrame
 	FrameWork()
 	{
 		super("ICG test");
-		//set window's szie
+		//set window's size
 		setPreferredSize(new Dimension(minWindowWidth, minWindowHeight));
 		setMinimumSize(new Dimension(minWindowWidth, minWindowHeight));
 		setResizable(true);

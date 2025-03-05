@@ -5,6 +5,7 @@ public class SelectedSettings {
     private Boolean STRAIGHT_LINE_MODE;
     private Boolean WAVED_LINE_MODE;
     private Boolean TRIANGLE_PATTERN_MODE;
+    private Boolean SQUARE_PATTERN_MODE;
     private Boolean FUN_MODE;
 
     private Color currentColor;
@@ -15,6 +16,7 @@ public class SelectedSettings {
         this.STRAIGHT_LINE_MODE = true;
         this.WAVED_LINE_MODE = false;
         this.TRIANGLE_PATTERN_MODE = false;
+        this.SQUARE_PATTERN_MODE = false;
         this.FUN_MODE = false;
     }
 
@@ -40,6 +42,7 @@ public class SelectedSettings {
         this.STRAIGHT_LINE_MODE = true;
         this.WAVED_LINE_MODE = false;
         this.TRIANGLE_PATTERN_MODE = false;
+        this.SQUARE_PATTERN_MODE = false;
         this.FUN_MODE = false;
     }
 
@@ -47,6 +50,7 @@ public class SelectedSettings {
         this.STRAIGHT_LINE_MODE = false;
         this.WAVED_LINE_MODE = true;
         this.TRIANGLE_PATTERN_MODE = false;
+        this.SQUARE_PATTERN_MODE = false;
         this.FUN_MODE = false;
     }
 
@@ -54,6 +58,15 @@ public class SelectedSettings {
         this.STRAIGHT_LINE_MODE = false;
         this.WAVED_LINE_MODE = false;
         this.TRIANGLE_PATTERN_MODE = true;
+        this.SQUARE_PATTERN_MODE = false;
+        this.FUN_MODE = false;
+    }
+
+    public void setSquarePatternMode() {
+        this.STRAIGHT_LINE_MODE = false;
+        this.WAVED_LINE_MODE = false;
+        this.TRIANGLE_PATTERN_MODE = false;
+        this.SQUARE_PATTERN_MODE = true;
         this.FUN_MODE = false;
     }
 
@@ -61,6 +74,7 @@ public class SelectedSettings {
         this.STRAIGHT_LINE_MODE = false;
         this.WAVED_LINE_MODE = false;
         this.TRIANGLE_PATTERN_MODE = false;
+        this.SQUARE_PATTERN_MODE = false;
         this.FUN_MODE = true;
     }
 }
