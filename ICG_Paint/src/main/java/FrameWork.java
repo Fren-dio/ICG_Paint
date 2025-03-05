@@ -16,7 +16,7 @@ public class FrameWork extends JFrame
 	{
 		super("ICG test");
 		//set window's szie
-		setPreferredSize(new Dimension(800, 600));
+		setPreferredSize(new Dimension(minWindowWidth, minWindowHeight));
 		setMinimumSize(new Dimension(minWindowWidth, minWindowHeight));
 		setResizable(true);
 		//set window's position
@@ -25,7 +25,7 @@ public class FrameWork extends JFrame
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		//set image panel
-		ColorHolder defaultColor = new ColorHolder(new Color(0, 0, 0));
+		SelectedSettings defaultColor = new SelectedSettings(new Color(0, 0, 0));
 		ImagePanel p = new ImagePanel(defaultColor);
 		add(p);
 

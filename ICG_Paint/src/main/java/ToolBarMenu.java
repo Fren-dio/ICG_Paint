@@ -6,20 +6,23 @@ import java.util.Objects;
 
 public class ToolBarMenu extends JToolBar {
 
-    private int btnSize = 50;
+    private final int btnSize = 50;
+    private final int minSelecterHeight = 400;
+    private final int minSelecterWidth = 300;
 
-    private ImagePanel imagePanel;
-    private ColorHolder colorHolder;
+    private final ImagePanel imagePanel;
+    private final SelectedSettings selectedSettings;
 
-    public ToolBarMenu(ImagePanel imagePanel, ColorHolder colorHolder) {
+    public ToolBarMenu(ImagePanel imagePanel, SelectedSettings selectedSettings) {
         this.imagePanel = imagePanel;
-        this.colorHolder = colorHolder; // Инициализация colorHolder
+        this.selectedSettings = selectedSettings;
 
         // Кнопка для прямой линии
         JButton lineBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("line_icon.jpg"))));
         lineBtn.setPreferredSize(new Dimension(btnSize, btnSize));
         lineBtn.setMinimumSize(new Dimension(btnSize, btnSize));
         lineBtn.setMaximumSize(new Dimension(btnSize, btnSize));
+        lineBtn.addActionListener(e -> selectedSettings.setStraightLineMode());
         this.add(lineBtn);
 
         // Кнопка для кривой/волнистой линии
@@ -27,6 +30,7 @@ public class ToolBarMenu extends JToolBar {
         wavedLineBtn.setPreferredSize(new Dimension(btnSize, btnSize));
         wavedLineBtn.setMinimumSize(new Dimension(btnSize, btnSize));
         wavedLineBtn.setMaximumSize(new Dimension(btnSize, btnSize));
+        wavedLineBtn.addActionListener(e -> selectedSettings.setWavedLineMode());
         this.add(wavedLineBtn);
 
         // Кнопка для заливки
@@ -43,6 +47,47 @@ public class ToolBarMenu extends JToolBar {
         clearBtn.setMaximumSize(new Dimension(btnSize, btnSize));
         clearBtn.addActionListener(ev -> this.imagePanel.clean());
         this.add(clearBtn);
+
+
+        JButton funBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("fun_icon.jpg"))));
+        funBtn.setPreferredSize(new Dimension(btnSize, btnSize));
+        funBtn.setMinimumSize(new Dimension(btnSize, btnSize));
+        funBtn.setMaximumSize(new Dimension(btnSize, btnSize));
+        funBtn.addActionListener(ev -> selectedSettings.setFunPatternMode());
+        this.add(funBtn);
+
+
+        // настройки для штампов
+        JPanel patternsGrid = new JPanel();
+        patternsGrid.setLayout(new BoxLayout(patternsGrid, BoxLayout.X_AXIS));
+
+        JButton triangleBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("triangle_icon.jpg"))));
+        setSizeBtn(triangleBtn);
+        triangleBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Открываем диалог выбора
+                JFrame triangleFrame = new JFrame("Choose triangle settings");
+                triangleFrame.setPreferredSize(new Dimension(minSelecterWidth, minSelecterHeight));
+                triangleFrame.setMinimumSize(new Dimension(minSelecterWidth, minSelecterHeight));
+                triangleFrame.setResizable(false);
+
+                //set window's position
+                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+                triangleFrame.setLocation((int)((screenSize.getWidth()-minSelecterWidth)/2),
+                        (int)((screenSize.getHeight()-minSelecterHeight)/2));
+
+
+                triangleFrame.pack();
+                triangleFrame.setVisible(true);
+                selectedSettings.setTrianglePatternMode(); // Обновляем цвет в ColorHolder
+
+            }
+        });
+        patternsGrid.add(triangleBtn);
+
+        this.add(patternsGrid);
+
 
         // Панель для цветовых кнопок
         JPanel colorsGrid = new JPanel();
@@ -94,7 +139,10 @@ public class ToolBarMenu extends JToolBar {
         this.add(colorsGrid);
 
         // Кнопка для выбора произвольного цвета
-        JButton colorSelectBtn = new JButton("other");
+        JButton colorSelectBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("palitra_icon.jpg"))));
+        colorSelectBtn.setPreferredSize(new Dimension(btnSize, btnSize));
+        colorSelectBtn.setMinimumSize(new Dimension(btnSize, btnSize));
+        colorSelectBtn.setMaximumSize(new Dimension(btnSize, btnSize));
         colorSelectBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -108,7 +156,7 @@ public class ToolBarMenu extends JToolBar {
                 // Если пользователь выбрал цвет (не нажал "Cancel")
                 if (selectedColor != null) {
                     colorSelectBtn.setBackground(selectedColor);
-                    colorHolder.setCurrentColor(selectedColor); // Обновляем цвет в ColorHolder
+                    selectedSettings.setCurrentColor(selectedColor); // Обновляем цвет в ColorHolder
                 }
             }
         });
@@ -132,11 +180,15 @@ public class ToolBarMenu extends JToolBar {
         button.setBackground(color);
 
         // Устанавливаем обработчик для изменения цвета
-        button.addActionListener(e -> colorHolder.setCurrentColor(color));
+        button.addActionListener(e -> selectedSettings.setCurrentColor(color));
         return button;
     }
 
-    private void toggleColorSelecter() {
-        // Логика для выбора цвета (если требуется)
+    private JButton setSizeBtn(JButton btn) {
+        btn.setPreferredSize(new Dimension(btnSize, btnSize));
+        btn.setMinimumSize(new Dimension(btnSize, btnSize));
+        btn.setMaximumSize(new Dimension(btnSize, btnSize ));
+
+        return btn;
     }
 }
