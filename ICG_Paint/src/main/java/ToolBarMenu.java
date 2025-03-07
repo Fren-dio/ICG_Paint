@@ -33,6 +33,8 @@ public class ToolBarMenu extends JToolBar {
         wavedLineBtn.addActionListener(e -> selectedSettings.setWavedLineMode());
         this.add(wavedLineBtn);
 
+        this.addSeparator();
+
         // Кнопка для заливки
         JButton fillBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("filling_icon.jpg"))));
         fillBtn.setPreferredSize(new Dimension(btnSize, btnSize));
@@ -57,12 +59,37 @@ public class ToolBarMenu extends JToolBar {
         this.add(funBtn);
 
 
+        this.addSeparator();
+
         // настройки для штампов
         JPanel patternsGrid = new JPanel();
         patternsGrid.setLayout(new BoxLayout(patternsGrid, BoxLayout.X_AXIS));
         createPatternsGrid(patternsGrid);
         this.add(patternsGrid);
 
+        this.addSeparator();
+
+        JPanel weightsGrid = new JPanel();
+        weightsGrid.setLayout(new BoxLayout(weightsGrid, BoxLayout.Y_AXIS));
+        JButton lightWeightLineBtn = new JButton("light");
+        Dimension weightBtnSize = new Dimension(btnSize*2, btnSize/3);
+        lightWeightLineBtn.setPreferredSize(weightBtnSize);
+        lightWeightLineBtn.setMinimumSize(weightBtnSize);
+        lightWeightLineBtn.setMaximumSize(weightBtnSize);
+        weightsGrid.add(lightWeightLineBtn);
+        JButton mediumWeightLineBtn = new JButton("medium");
+        mediumWeightLineBtn.setPreferredSize(weightBtnSize);
+        mediumWeightLineBtn.setMinimumSize(weightBtnSize);
+        mediumWeightLineBtn.setMaximumSize(weightBtnSize);
+        weightsGrid.add(mediumWeightLineBtn);
+        JButton boldWeightLineBtn = new JButton("bold");
+        boldWeightLineBtn.setPreferredSize(weightBtnSize);
+        boldWeightLineBtn.setMinimumSize(weightBtnSize);
+        boldWeightLineBtn.setMaximumSize(weightBtnSize);
+        weightsGrid.add(boldWeightLineBtn);
+
+        this.add(weightsGrid);
+        this.addSeparator();
 
         // Панель для цветовых кнопок
         JPanel colorsGrid = new JPanel();
