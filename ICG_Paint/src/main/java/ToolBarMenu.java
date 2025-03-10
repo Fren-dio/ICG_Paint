@@ -69,6 +69,8 @@ public class ToolBarMenu extends JToolBar {
 
         this.addSeparator();
 
+
+        // panel with weight of line settings
         JPanel weightsGrid = new JPanel();
         weightsGrid.setLayout(new BoxLayout(weightsGrid, BoxLayout.Y_AXIS));
         JButton lightWeightLineBtn = new JButton("light");
@@ -76,16 +78,19 @@ public class ToolBarMenu extends JToolBar {
         lightWeightLineBtn.setPreferredSize(weightBtnSize);
         lightWeightLineBtn.setMinimumSize(weightBtnSize);
         lightWeightLineBtn.setMaximumSize(weightBtnSize);
+        lightWeightLineBtn.addActionListener(e -> selectedSettings.setLightWeight());
         weightsGrid.add(lightWeightLineBtn);
         JButton mediumWeightLineBtn = new JButton("medium");
         mediumWeightLineBtn.setPreferredSize(weightBtnSize);
         mediumWeightLineBtn.setMinimumSize(weightBtnSize);
         mediumWeightLineBtn.setMaximumSize(weightBtnSize);
+        mediumWeightLineBtn.addActionListener(e -> selectedSettings.setMediumWeight());
         weightsGrid.add(mediumWeightLineBtn);
         JButton boldWeightLineBtn = new JButton("bold");
         boldWeightLineBtn.setPreferredSize(weightBtnSize);
         boldWeightLineBtn.setMinimumSize(weightBtnSize);
         boldWeightLineBtn.setMaximumSize(weightBtnSize);
+        boldWeightLineBtn.addActionListener(e -> selectedSettings.setBoldWeight());
         weightsGrid.add(boldWeightLineBtn);
 
         this.add(weightsGrid);
@@ -164,11 +169,6 @@ public class ToolBarMenu extends JToolBar {
         });
         this.add(colorSelectBtn);
 
-
-        JPanel widthsGrid = new JPanel();
-        widthsGrid.setLayout(new BoxLayout(colorsGrid, BoxLayout.Y_AXIS));
-        //JButton width
-        //this.add(widthsGrid);
 
         // Настройки панели инструментов
         this.setFloatable(false);
