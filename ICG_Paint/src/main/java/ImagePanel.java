@@ -27,18 +27,17 @@ public class ImagePanel extends JPanel implements MouseListener {
 	private BufferedImage exampleImage; // Изображение для примера фигуры
 
 	public ImagePanel() {
-		currentImage = new BufferedImage(800, 600, BufferedImage.TYPE_INT_ARGB);
-		exampleImage = new BufferedImage(800, 600, BufferedImage.TYPE_INT_ARGB);
+		currentImage = new BufferedImage(1000, 700, BufferedImage.TYPE_INT_ARGB);
+		exampleImage = new BufferedImage(1000, 700, BufferedImage.TYPE_INT_ARGB);
 		clearExampleImage();
 	}
 
 	public ImagePanel(SelectedSettings selectedSettings, int figureSize, int figureRotate, int figureCorners) {
-		this();
-		this.areSettingForm = false;
 		this.selectedSettings = selectedSettings;
 		this.FIGURE_SIZE = figureSize;
 		this.FIGURE_ROTATE = figureRotate;
 		this.FIGURE_COUNT_CORNER = figureCorners;
+		currentImage = new BufferedImage(1000, 700, BufferedImage.TYPE_INT_ARGB);
 	}
 
 	public ImagePanel(SelectedSettings selectedSettings) {
@@ -106,6 +105,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 		this.FIGURE_SIZE = figureSize;
 		this.FIGURE_ROTATE = figureRotate;
 		this.FIGURE_COUNT_CORNER = figureCorners;
+		drawExampleFigure();
 	}
 
 
@@ -125,11 +125,6 @@ public class ImagePanel extends JPanel implements MouseListener {
 		// Отрисовка основного изображения
 		if (currentImage != null) {
 			g.drawImage(currentImage, 0, 0, this);
-		}
-
-		// Отрисовка примера фигуры
-		if (areSettingForm) {
-			g.drawImage(exampleImage, 0, 0, this);
 		}
 	}
 
@@ -288,15 +283,16 @@ public class ImagePanel extends JPanel implements MouseListener {
 		repaint();
 	}
 
-	public void drawExampleFigure(){
-		repaint();
-		clearExampleImage(); // Очищаем изображение перед рисованием новой фигуры
+	private void drawExampleFigure() {
+		if (currentImage == null) {
+			System.out.println("currentImage is null");
+			return;
+		}
 
-		if (currentImage == null) return; // Проверка на null
-
-		int currentX = getWidth() / 2;
-		int currentY = getHeight() / 2;
+		int currentX = currentImage.getWidth() / 2;
+		int currentY = currentImage.getHeight() / 2;
 		int corners = this.selectedSettings.getFigureCorners();
+		int size = this.selectedSettings.getFigureSize();
 
 		int[] xPoints = new int[corners];
 		int[] yPoints = new int[corners];
@@ -305,14 +301,14 @@ public class ImagePanel extends JPanel implements MouseListener {
 
 		for (int i = 0; i < corners; i++) {
 			double angle = i * angleStep;
-			xPoints[i] = (int) (currentX + this.FIGURE_SIZE / 2 * Math.cos(angle));
-			yPoints[i] = (int) (currentY + this.FIGURE_SIZE / 2 * Math.sin(angle));
+			xPoints[i] = (int) (currentX + size / 2 * Math.cos(angle));
+			yPoints[i] = (int) (currentY + size / 2 * Math.sin(angle));
 		}
 
 		int[] xPointsRotated = new int[xPoints.length];
 		int[] yPointsRotated = new int[yPoints.length];
 
-		double radians = Math.toRadians(this.FIGURE_ROTATE);
+		double radians = Math.toRadians(this.selectedSettings.getFigureRotate());
 		for (int i = 0; i < xPoints.length; i++) {
 			int x = xPoints[i] - currentX;
 			int y = yPoints[i] - currentY;
@@ -321,12 +317,17 @@ public class ImagePanel extends JPanel implements MouseListener {
 		}
 
 		Graphics2D g2d = currentImage.createGraphics();
-		g2d.setColor(this.selectedSettings.getCurrentColor());
-		g2d.setStroke(new BasicStroke(selectedSettings.getCurrentWeight()));
-		g2d.drawPolygon(xPointsRotated, yPointsRotated, corners);
+		for (int i = 0; i < corners; i++) {
+			int nextIndex = (i + 1) % corners; // Следующая вершина (с замыканием на первую)
+			myDrawLine(g2d, xPointsRotated[i], yPointsRotated[i],
+					xPointsRotated[nextIndex], yPointsRotated[nextIndex], selectedSettings.getCurrentWeight());
+		}
 		g2d.dispose();
 		repaint();
+
+		repaint();
 	}
+
 
 	private void drawFigure(MouseEvent ev) {
 		if (currentImage == null) {
@@ -337,6 +338,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 		int currentX = ev.getX();
 		int currentY = ev.getY();
 		int corners = this.selectedSettings.getFigureCorners();
+		int size = this.selectedSettings.getFigureSize();
 
 		int[] xPoints = new int[corners];
 		int[] yPoints = new int[corners];
@@ -345,14 +347,14 @@ public class ImagePanel extends JPanel implements MouseListener {
 
 		for (int i = 0; i < corners; i++) {
 			double angle = i * angleStep;
-			xPoints[i] = (int) (currentX + this.FIGURE_SIZE / 2 * Math.cos(angle));
-			yPoints[i] = (int) (currentY + this.FIGURE_SIZE / 2 * Math.sin(angle));
+			xPoints[i] = (int) (currentX + size / 2 * Math.cos(angle));
+			yPoints[i] = (int) (currentY + size / 2 * Math.sin(angle));
 		}
 
 		int[] xPointsRotated = new int[xPoints.length];
 		int[] yPointsRotated = new int[yPoints.length];
 
-		double radians = Math.toRadians(this.FIGURE_ROTATE);
+		double radians = Math.toRadians(this.selectedSettings.getFigureRotate());
 		for (int i = 0; i < xPoints.length; i++) {
 			int x = xPoints[i] - currentX;
 			int y = yPoints[i] - currentY;
@@ -361,11 +363,58 @@ public class ImagePanel extends JPanel implements MouseListener {
 		}
 
 		Graphics2D g2d = currentImage.createGraphics();
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.setColor(this.selectedSettings.getCurrentColor());
-		g2d.setStroke(new BasicStroke(selectedSettings.getCurrentWeight()));
-		g2d.drawPolygon(xPointsRotated, yPointsRotated, corners);
+		for (int i = 0; i < corners; i++) {
+			int nextIndex = (i + 1) % corners; // Следующая вершина (с замыканием на первую)
+			myDrawLine(g2d, xPointsRotated[i], yPointsRotated[i],
+					xPointsRotated[nextIndex], yPointsRotated[nextIndex], selectedSettings.getCurrentWeight());
+		}
 		g2d.dispose();
+		repaint();
+
+		repaint();
+	}
+
+	public void drawExample() {
+		if (currentImage == null) {
+			System.out.println("currentImage is null");
+			return;
+		}
+
+		int currentX = 100;
+		int currentY = 100;
+		int corners = this.selectedSettings.getFigureCorners();
+		int size = this.selectedSettings.getFigureSize();
+
+		int[] xPoints = new int[corners];
+		int[] yPoints = new int[corners];
+
+		double angleStep = 2 * Math.PI / corners;
+
+		for (int i = 0; i < corners; i++) {
+			double angle = i * angleStep;
+			xPoints[i] = (int) (currentX + size / 2 * Math.cos(angle));
+			yPoints[i] = (int) (currentY + size / 2 * Math.sin(angle));
+		}
+
+		int[] xPointsRotated = new int[xPoints.length];
+		int[] yPointsRotated = new int[yPoints.length];
+
+		double radians = Math.toRadians(this.selectedSettings.getFigureRotate());
+		for (int i = 0; i < xPoints.length; i++) {
+			int x = xPoints[i] - currentX;
+			int y = yPoints[i] - currentY;
+			xPointsRotated[i] = (int) (x * Math.cos(radians) - y * Math.sin(radians) + currentX);
+			yPointsRotated[i] = (int) (x * Math.sin(radians) + y * Math.cos(radians) + currentY);
+		}
+
+		Graphics2D g2d = currentImage.createGraphics();
+		for (int i = 0; i < corners; i++) {
+			int nextIndex = (i + 1) % corners; // Следующая вершина (с замыканием на первую)
+			myDrawLine(g2d, xPointsRotated[i], yPointsRotated[i],
+					xPointsRotated[nextIndex], yPointsRotated[nextIndex], selectedSettings.getCurrentWeight());
+		}
+		g2d.dispose();
+		repaint();
 
 		repaint();
 	}

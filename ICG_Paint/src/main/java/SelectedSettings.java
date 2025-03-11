@@ -72,6 +72,7 @@ public class SelectedSettings {
 
     public void setFigurePatternMode(int corners) {
         setAllFalse();
+        this.FIGURE_MODE = true;
         this.FIGURE_CORNERS = corners;
     }
 

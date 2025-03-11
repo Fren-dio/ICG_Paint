@@ -204,9 +204,7 @@ public class ToolBarMenu extends JToolBar {
         squareBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Открываем диалог выбора
                 int corners = 4;
-                JFrame squareFrame = new JFrame("Choose square settings");
                 createChosenWindow(corners, "Five corners Settings");
                 selectedSettings.setFigurePatternMode(corners);
 
@@ -223,7 +221,6 @@ public class ToolBarMenu extends JToolBar {
             public void actionPerformed(ActionEvent e) {
                 // Открываем диалог выбора
                 int corners = 5;
-                JFrame squareFrame = new JFrame("Choose square settings");
                 createChosenWindow(corners, "Six corners Settings");
                 selectedSettings.setFigurePatternMode(corners);
 
@@ -239,13 +236,45 @@ public class ToolBarMenu extends JToolBar {
             public void actionPerformed(ActionEvent e) {
                 // Открываем диалог выбора
                 int corners = 6;
-                JFrame squareFrame = new JFrame("Choose square settings");
                 createChosenWindow(corners, "Square Settings");
                 selectedSettings.setFigurePatternMode(corners);
 
             }
         });
         patternsGrid.add(sixBtn);
+
+        JButton polygonBtn = new JButton("Polygon");
+        polygonBtn.setToolTipText("Draw a polygon with chosen number of corners.");
+        setSizeSquareBtn(polygonBtn, (int)(btnSize * 0.85));
+        polygonBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int corners = showPolygonCornersDialog();
+                if (corners != -1) {
+                    createChosenWindow(corners, "Polygon Settings");
+                    selectedSettings.setFigurePatternMode(corners);
+                }
+            }
+        });
+        patternsGrid.add(polygonBtn);
+    }
+
+    private int showPolygonCornersDialog() {
+        // Создаем массив возможных значений углов
+        Integer[] cornersOptions = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
+
+        // Создаем диалог выбора
+        Integer selectedCorners = (Integer) JOptionPane.showInputDialog(
+                this,
+                "Choose the number of corners:",
+                "Polygon Corners",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                cornersOptions,
+                cornersOptions[0]
+        );
+
+        return (selectedCorners != null) ? selectedCorners : -1;
     }
 
     // Метод для создания цветной кнопки
@@ -300,15 +329,15 @@ public class ToolBarMenu extends JToolBar {
         // Установим позицию окна
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         figureSetSettingsFrame.setLocation(
-                (int)((screenSize.getWidth() - formSizeW) / 2),
-                (int)((screenSize.getHeight() - formSizeH) / 2)
+                (int) ((screenSize.getWidth() - formSizeW) / 2),
+                (int) ((screenSize.getHeight() - formSizeH) / 2)
         );
 
         JPanel mainPanel = new JPanel(new BorderLayout());
 
         // Панель для отображения фигуры
-        ImagePanel figurePanel = new ImagePanel(selectedSettings, 100, 0, corners); // Инициализация с начальными параметрами
-        figurePanel.setPreferredSize(new Dimension(formSizeW - 200, formSizeH)); // Задаем размер панели
+        ImagePanel figurePanel = new ImagePanel(selectedSettings, 100, 0, corners);
+        figurePanel.setPreferredSize(new Dimension(formSizeW - 200, formSizeH));
         mainPanel.add(figurePanel, BorderLayout.CENTER);
 
         // Панель настроек
@@ -316,14 +345,14 @@ public class ToolBarMenu extends JToolBar {
         settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
 
         JLabel labelSize = new JLabel("Choose size:");
-        JSlider sizeSlider = new JSlider(JSlider.HORIZONTAL, 5, 250, 125); // Уменьшили диапазон слайдера
+        JSlider sizeSlider = new JSlider(JSlider.HORIZONTAL, 5, 250, 125);
         sizeSlider.setMajorTickSpacing(50);
         sizeSlider.setMinorTickSpacing(25);
         sizeSlider.setPaintTicks(true);
         sizeSlider.setPaintLabels(true);
 
         JLabel labelRotation = new JLabel("Choose rotation angle:");
-        JSlider rotationSlider = new JSlider(JSlider.HORIZONTAL, 0, 720, 0); // Уменьшили диапазон слайдера
+        JSlider rotationSlider = new JSlider(JSlider.HORIZONTAL, 0, 720, 0);
         rotationSlider.setMajorTickSpacing(90);
         rotationSlider.setMinorTickSpacing(30);
         rotationSlider.setPaintTicks(true);
@@ -335,7 +364,6 @@ public class ToolBarMenu extends JToolBar {
             selectedSettings.setFigureSettings(sizeSlider.getValue(), rotationSlider.getValue());
             selectedSettings.setFigurePatternMode(corners);
             selectedSettings.setFigureMode();
-            figurePanel.repaint(); // Перерисовываем панель
             JOptionPane.showMessageDialog(figureSetSettingsFrame, "Settings applied!");
         });
 
@@ -344,8 +372,8 @@ public class ToolBarMenu extends JToolBar {
             figurePanel.setFigureParameters(sizeSlider.getValue(), rotationSlider.getValue(), corners);
             selectedSettings.setFigureSettings(sizeSlider.getValue(), rotationSlider.getValue());
             selectedSettings.setFigurePatternMode(corners);
-            figureSetSettingsFrame.dispose();
             selectedSettings.setFigureMode();
+            figureSetSettingsFrame.dispose();
         });
 
         JButton cancelButton = new JButton("Cancel");
@@ -355,10 +383,10 @@ public class ToolBarMenu extends JToolBar {
 
         settingsPanel.add(labelSize);
         settingsPanel.add(sizeSlider);
-        settingsPanel.add(Box.createRigidArea(new Dimension(0, 5))); // Уменьшили отступы
+        settingsPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         settingsPanel.add(labelRotation);
         settingsPanel.add(rotationSlider);
-        settingsPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Уменьшили отступы
+        settingsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         settingsPanel.add(applyButton);
         settingsPanel.add(okButton);
         settingsPanel.add(cancelButton);
@@ -373,8 +401,6 @@ public class ToolBarMenu extends JToolBar {
                 int size = sizeSlider.getValue();
                 int rotation = rotationSlider.getValue();
                 figurePanel.setFigureParameters(size, rotation, corners);
-                figurePanel.areSettingForm = true;
-                figurePanel.repaint(); // Перерисовываем панель при изменении параметров
             }
         };
         sizeSlider.addChangeListener(updateListener);
@@ -388,7 +414,6 @@ public class ToolBarMenu extends JToolBar {
                 figureSetSettingsFrame.dispose();
             }
         });
-
     }
 
 }
