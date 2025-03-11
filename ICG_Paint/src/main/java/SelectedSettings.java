@@ -5,23 +5,27 @@ public class SelectedSettings {
     private Boolean STRAIGHT_LINE_MODE;
     private Boolean WAVED_LINE_MODE;
     private int LINE_WEIGHT_RANGE;
-    private final int DEFAULT_LINE_WEIGHT = 1;
-    private Boolean TRIANGLE_PATTERN_MODE;
-    private Boolean SQUARE_PATTERN_MODE;
+    private int FIGURE_CORNERS;
+    private boolean FIGURE_MODE;
     private Boolean FUN_MODE;
+
+    private Boolean FILL_MODE;
 
     public int LIGHT_LINE_WEIGHT = 1;
 
     private Color currentColor;
-    private String currentMode;
+
+    private int FIGURE_SIZE;
+    private int FIGURE_ROTATE;
 
     public SelectedSettings(Color initialColor) {
         this.currentColor = initialColor;
         this.STRAIGHT_LINE_MODE = true;
         this.WAVED_LINE_MODE = false;
-        this.TRIANGLE_PATTERN_MODE = false;
-        this.SQUARE_PATTERN_MODE = false;
+        this.FIGURE_CORNERS = 3;
+        this.FIGURE_MODE = false;
         this.FUN_MODE = false;
+        this.FILL_MODE = false;
 
         this.LINE_WEIGHT_RANGE = 1;
     }
@@ -37,12 +41,12 @@ public class SelectedSettings {
     public String getCurrentMode() {
         if (this.WAVED_LINE_MODE)
             return "WAVED_LINE_MODE";
-        if (this.TRIANGLE_PATTERN_MODE)
-            return "TRIANGLE_PATTERN_MODE";
-        if (this.SQUARE_PATTERN_MODE)
-            return "SQUARE_PATTERN_MODE";
         if (this.FUN_MODE)
             return "FUN_MODE";
+        if (this.FIGURE_MODE)
+            return "FIGURE_MODE";
+        if (this.FILL_MODE)
+            return "FILL_MODE";
         return "STRAIGHT_LINE_MODE";
     }
 
@@ -61,14 +65,18 @@ public class SelectedSettings {
         this.WAVED_LINE_MODE = true;
     }
 
-    public void setTrianglePatternMode() {
+    public void setFillMode() {
         setAllFalse();
-        this.TRIANGLE_PATTERN_MODE = true;
+        this.FILL_MODE = true;
     }
 
-    public void setSquarePatternMode() {
+    public void setFigurePatternMode(int corners) {
         setAllFalse();
-        this.SQUARE_PATTERN_MODE = true;
+        this.FIGURE_CORNERS = corners;
+    }
+
+    public int getFigureCorners() {
+        return this.FIGURE_CORNERS;
     }
 
     public void setFunPatternMode() {
@@ -88,12 +96,29 @@ public class SelectedSettings {
         this.LINE_WEIGHT_RANGE = 6;
     }
 
+    public void setFigureSettings(int size, int rotate){
+        this.FIGURE_SIZE = size;
+        this.FIGURE_ROTATE = rotate;
+    }
+
+    public int getFigureSize() {
+        return this.FIGURE_SIZE;
+    }
+
+    public void setFigureMode() {
+        this.FIGURE_MODE = true;
+    }
+
+    public int getFigureRotate() {
+        return this.FIGURE_ROTATE;
+    }
+
     private void setAllFalse(){
         this.STRAIGHT_LINE_MODE = false;
         this.WAVED_LINE_MODE = false;
-        this.TRIANGLE_PATTERN_MODE = false;
-        this.SQUARE_PATTERN_MODE = false;
         this.FUN_MODE = false;
+        this.FIGURE_MODE = false;
+        this.FILL_MODE = false;
 
     }
 }
