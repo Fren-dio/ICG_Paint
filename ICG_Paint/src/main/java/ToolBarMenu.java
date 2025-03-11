@@ -46,7 +46,7 @@ public class ToolBarMenu extends JToolBar {
         JButton clearBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("clear_icon.jpg"))));
         setSizeSquareBtn(clearBtn, btnSize);
         clearBtn.setToolTipText("Clear all area.");
-        clearBtn.addActionListener(ev -> this.imagePanel.clean());
+        clearBtn.addActionListener(ev -> this.imagePanel.clear());
         this.add(clearBtn);
 
 
@@ -110,17 +110,17 @@ public class ToolBarMenu extends JToolBar {
 
         // Красный цвет
         JButton redBtn = createColorButton(new Color(255, 0, 0));
-        blackBtn.setToolTipText("Red color. RGB=(255,0,0)");
+        redBtn.setToolTipText("Red color. RGB=(255,0,0)");
         row1.add(redBtn);
 
         // Желтый цвет
         JButton redGreenBtn = createColorButton(new Color(255, 255, 0));
-        blackBtn.setToolTipText("Yellow color. RGB=(255,255,0)");
+        redGreenBtn.setToolTipText("Yellow color. RGB=(255,255,0)");
         row1.add(redGreenBtn);
 
         // Зеленый цвет
         JButton greenBtn = createColorButton(new Color(0, 255, 0));
-        blackBtn.setToolTipText("Green color. RGB=(0,255,0)");
+        greenBtn.setToolTipText("Green color. RGB=(0,255,0)");
         row1.add(greenBtn);
 
         // Второй ряд цветов
@@ -129,22 +129,22 @@ public class ToolBarMenu extends JToolBar {
 
         // Голубой цвет
         JButton greenBlueBtn = createColorButton(new Color(0, 255, 255));
-        blackBtn.setToolTipText("Azure color. RGB=(0,255,255)");
+        greenBlueBtn.setToolTipText("Azure color. RGB=(0,255,255)");
         row2.add(greenBlueBtn);
 
         // Синий цвет
         JButton blueBtn = createColorButton(new Color(0, 0, 255));
-        blackBtn.setToolTipText("Blue color. RGB=(0,0,255)");
+        blueBtn.setToolTipText("Blue color. RGB=(0,0,255)");
         row2.add(blueBtn);
 
         // Пурпурный цвет
         JButton redBlueBtn = createColorButton(new Color(255, 0, 255));
-        blackBtn.setToolTipText("Purple color. RGB=(255,0,255)");
+        redBlueBtn.setToolTipText("Purple color. RGB=(255,0,255)");
         row2.add(redBlueBtn);
 
         // Белый цвет
         JButton whiteBtn = createColorButton(new Color(255, 255, 255));
-        blackBtn.setToolTipText("White color. RGB=(255,255,255)");
+        whiteBtn.setToolTipText("White color. RGB=(255,255,255)");
         row2.add(whiteBtn);
 
         // Добавляем ряды в сетку
@@ -205,7 +205,7 @@ public class ToolBarMenu extends JToolBar {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int corners = 4;
-                createChosenWindow(corners, "Five corners Settings");
+                createChosenWindow(corners, "Four corners Settings");
                 selectedSettings.setFigurePatternMode(corners);
 
             }
@@ -221,7 +221,7 @@ public class ToolBarMenu extends JToolBar {
             public void actionPerformed(ActionEvent e) {
                 // Открываем диалог выбора
                 int corners = 5;
-                createChosenWindow(corners, "Six corners Settings");
+                createChosenWindow(corners, "Five corners Settings");
                 selectedSettings.setFigurePatternMode(corners);
 
             }
@@ -236,7 +236,7 @@ public class ToolBarMenu extends JToolBar {
             public void actionPerformed(ActionEvent e) {
                 // Открываем диалог выбора
                 int corners = 6;
-                createChosenWindow(corners, "Square Settings");
+                createChosenWindow(corners, "Six corners Settings");
                 selectedSettings.setFigurePatternMode(corners);
 
             }
@@ -259,7 +259,7 @@ public class ToolBarMenu extends JToolBar {
         patternsGrid.add(polygonBtn);
     }
 
-    private int showPolygonCornersDialog() {
+    int showPolygonCornersDialog() {
         // Создаем массив возможных значений углов
         Integer[] cornersOptions = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
 
@@ -318,7 +318,7 @@ public class ToolBarMenu extends JToolBar {
         return frame;
     }
 
-    private void createChosenWindow(int corners, String formName) {
+    void createChosenWindow(int corners, String formName) {
         int formSizeH = 300;
         int formSizeW = 500;
         JFrame figureSetSettingsFrame = new JFrame(formName);

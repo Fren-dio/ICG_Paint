@@ -40,6 +40,16 @@ public class ImagePanel extends JPanel implements MouseListener {
 		currentImage = new BufferedImage(1000, 700, BufferedImage.TYPE_INT_ARGB);
 	}
 
+	public void clear() {
+		if (currentImage != null) {
+			Graphics2D g2d = currentImage.createGraphics();
+			g2d.setColor(Color.lightGray);
+			g2d.fillRect(0, 0, currentImage.getWidth(), currentImage.getHeight());
+			g2d.dispose();
+			repaint();
+		}
+	}
+
 	public ImagePanel(SelectedSettings selectedSettings) {
 		this();
 		this.areSettingForm = false;

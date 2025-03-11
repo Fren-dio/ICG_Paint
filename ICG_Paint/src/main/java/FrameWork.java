@@ -1,4 +1,6 @@
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.*;
@@ -8,6 +10,7 @@ public class FrameWork extends JFrame
 {
 
 	private ImagePanel imagePanel;
+	private SelectedSettings selectedSettings;
 
 	public static void main(String[] args) {
 		new FrameWork();
@@ -30,7 +33,8 @@ public class FrameWork extends JFrame
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		//set image panel
-		SelectedSettings defaultColor = new SelectedSettings(new Color(0, 0, 0));
+		SelectedSettings defaultColor = new SelectedSettings(Color.lightGray);
+		this.selectedSettings = defaultColor;
 		ImagePanel p = new ImagePanel(defaultColor);
 		this.imagePanel = p;
 		add(p);
@@ -101,14 +105,87 @@ public class FrameWork extends JFrame
 		fileMenu.addSeparator(); // Добавляем разделитель
 		fileMenu.addMenuItem("Exit", () -> System.exit(0)); // Выход из программы
 
-		// Создаем пункт меню "Настройки"
-		MainMenuPanel settingsMenu = new MainMenuPanel("Settings");
-		settingsMenu.addMenuItem("Settings", () -> System.out.println("Открыть настройки"));
+
+		MainMenuPanel toolsMenu = new MainMenuPanel("Modes");
+		toolsMenu.addMenuItem("Straight line", () -> selectedSettings.setStraightLineMode());
+		toolsMenu.addMenuItem("Waved line", () -> selectedSettings.setWavedLineMode());
+		toolsMenu.addMenuItem("Fun mode", () -> selectedSettings.setFunPatternMode());
+		toolsMenu.addMenuItem("Fill mode", () -> selectedSettings.setFillMode());
+
+
+		MainMenuPanel colorsMenu = new MainMenuPanel("Colors");
+		colorsMenu.addMenuItem("Red", () -> selectedSettings.setCurrentColor(new Color(255, 0, 0)));
+		colorsMenu.addMenuItem("Green", () -> selectedSettings.setCurrentColor(new Color(0, 255, 0)));
+		colorsMenu.addMenuItem("Blue", () -> selectedSettings.setCurrentColor(new Color(0, 0, 255)));
+		colorsMenu.addMenuItem("Yellow", () -> selectedSettings.setCurrentColor(new Color(255, 255, 0)));
+		colorsMenu.addMenuItem("Purple", () -> selectedSettings.setCurrentColor(new Color(255, 0, 255)));
+		colorsMenu.addMenuItem("Laureate", () -> selectedSettings.setCurrentColor(new Color(0, 255, 255)));
+		colorsMenu.addMenuItem("Black", () -> selectedSettings.setCurrentColor(new Color(0, 0, 0)));
+		colorsMenu.addMenuItem("White", () -> selectedSettings.setCurrentColor(new Color(255, 255, 255)));
+		colorsMenu.addMenuItem("Other", () -> {
+				Color selectedColor = JColorChooser.showDialog(
+						this,
+						"Choose a Color",
+						null
+				);
+
+				// Если пользователь выбрал цвет (не нажал "Cancel")
+				if (selectedColor != null) {
+					selectedSettings.setCurrentColor(selectedColor); // Обновляем цвет в ColorHolder
+				}
+		});
+
+		MainMenuPanel boldsMenu = new MainMenuPanel("Bolds");
+		boldsMenu.addMenuItem("Light", () -> selectedSettings.setLightWeight());
+		boldsMenu.addMenuItem("Medium", () -> selectedSettings.setMediumWeight());
+		boldsMenu.addMenuItem("Bold", () -> selectedSettings.setBoldWeight());
+
+
+		MainMenuPanel patternsMenu = new MainMenuPanel("Patterns");
+		patternsMenu.addMenuItem("Triangle", () -> {
+			int corners = 3;
+			ToolBarMenu toolBarMenu = new ToolBarMenu(this.imagePanel, this.selectedSettings);
+			toolBarMenu.createChosenWindow(corners, "Triangle Settings");
+			selectedSettings.setFigurePatternMode(corners);
+		});
+		patternsMenu.addMenuItem("Square", () -> {
+			int corners = 4;
+			ToolBarMenu toolBarMenu = new ToolBarMenu(this.imagePanel, this.selectedSettings);
+			toolBarMenu.createChosenWindow(corners, "Square Settings");
+			selectedSettings.setFigurePatternMode(corners);
+		});
+		patternsMenu.addMenuItem("Five polygon", () -> {
+			int corners = 5;
+			ToolBarMenu toolBarMenu = new ToolBarMenu(this.imagePanel, this.selectedSettings);
+			toolBarMenu.createChosenWindow(corners, "Five polygon Settings");
+			selectedSettings.setFigurePatternMode(corners);
+		});
+		patternsMenu.addMenuItem("Six polygon", () -> {
+			int corners = 6;
+			ToolBarMenu toolBarMenu = new ToolBarMenu(this.imagePanel, this.selectedSettings);
+			toolBarMenu.createChosenWindow(corners, "Six polygon Settings");
+			selectedSettings.setFigurePatternMode(corners);
+		});
+		patternsMenu.addMenuItem("Other polygon", () -> {
+			ToolBarMenu toolBarMenu = new ToolBarMenu(this.imagePanel, this.selectedSettings);
+			int corners = toolBarMenu.showPolygonCornersDialog();
+			if (corners != -1) {
+				toolBarMenu.createChosenWindow(corners, "Polygon Settings");
+				selectedSettings.setFigurePatternMode(corners);
+			}
+		});
+
+		MainMenuPanel clearMenu = new MainMenuPanel("Clean");
+		clearMenu.addMenuItem("Clean", () -> this.imagePanel.clear());
 
 		// Добавляем пункты меню в меню бар
 		menuBar.add(aboutMenu);
 		menuBar.add(fileMenu);
-		menuBar.add(settingsMenu);
+		menuBar.add(toolsMenu);
+		menuBar.add(colorsMenu);
+		menuBar.add(boldsMenu);
+		menuBar.add(patternsMenu);
+		menuBar.add(clearMenu);
 
 		// Устанавливаем меню бар в окно
 		setJMenuBar(menuBar);
