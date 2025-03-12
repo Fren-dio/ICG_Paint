@@ -53,12 +53,37 @@ public class FrameWork extends JFrame
 		setVisible(true);
 	}
 
+	private void showAboutDialog() {
+		String aboutMessage =
+				"Программа: Графический редактор\n" +
+						"Версия: 1.0\n" +
+						"Автор: Кулишова Анастасия\n\n" +
+						"Основные особенности:\n" +
+						"- Редактор позволяет рисовать линии, фигуры и закрашивать области.\n" +
+						"- Редактор позволяет изменять цвет и толщину линий.\n" +
+						"- Редактор позволяет сохранять и открывать изображений.\n\n" +
+						"Подсказки:\n" +
+						"- Сохраняйте свои работы и открывайте изображения с помощью меню 'File'\n" +
+						"- Выбирайте режим рисования (линия/заливка/т.д.) с помощью 'Modes'\n" +
+						"- Выбирайте цвет для рисования с помощью 'Colors'\n" +
+						"- Выбирайте толщину линий с помощью 'Bolds'\n" +
+						"- Выбирайте шаблон для рисования фигуры с помощью 'Patterns'\n" +
+						"- Очищайте изображение с помощью 'Clean'.";
+
+		JOptionPane.showMessageDialog(
+				this, // Родительское окно
+				aboutMessage, // Сообщение
+				"О программе", // Заголовок окна
+				JOptionPane.INFORMATION_MESSAGE // Тип сообщения
+		);
+	}
+
 	public void addMainMenu() {
 		// Создаем меню бар
 		JMenuBar menuBar = new JMenuBar();
 
 		MainMenuPanel aboutMenu = new MainMenuPanel("About");
-		aboutMenu.addMenuItem("About", () -> System.out.println("get about"));
+		aboutMenu.addMenuItem("About", () -> showAboutDialog());
 
 		MainMenuPanel fileMenu = new MainMenuPanel("File");
 		fileMenu.addMenuItem("Open", () -> {

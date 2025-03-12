@@ -243,6 +243,21 @@ public class ToolBarMenu extends JToolBar {
         });
         patternsGrid.add(sixBtn);
 
+        JButton starBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("star_icon.jpg"))));
+        starBtn.setToolTipText("Draw square by chosen color and weight.");
+        setSizeSquareBtn(starBtn, (int)(btnSize*0.85));
+        starBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Открываем диалог выбора
+                int corners = 6;
+                createChosenWindowForStar(corners, "Star corners Settings");
+                selectedSettings.setFigurePatternMode(corners);
+
+            }
+        });
+        patternsGrid.add(starBtn);
+
         JButton polygonBtn = new JButton("Polygon");
         polygonBtn.setToolTipText("Draw a polygon with chosen number of corners.");
         setSizeSquareBtn(polygonBtn, (int)(btnSize * 0.85));
@@ -257,6 +272,96 @@ public class ToolBarMenu extends JToolBar {
             }
         });
         patternsGrid.add(polygonBtn);
+    }
+
+    private void createChosenWindowForStar(int corners, String formName) {
+        int formSizeH = 380;
+        int formSizeW = 500;
+        JFrame figureSetSettingsFrame = new JFrame(formName);
+
+        figureSetSettingsFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        figureSetSettingsFrame.setSize(formSizeW, formSizeH);
+
+        // Установим позицию окна
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        figureSetSettingsFrame.setLocation(
+                (int) ((screenSize.getWidth() - formSizeW) / 2),
+                (int) ((screenSize.getHeight() - formSizeH) / 2)
+        );
+
+        JPanel mainPanel = new JPanel(new BorderLayout());
+
+        // Панель для отображения фигуры
+        ImagePanel figurePanel = new ImagePanel(selectedSettings, 100, 0, corners);
+        figurePanel.setPreferredSize(new Dimension(formSizeW - 200, formSizeH));
+        mainPanel.add(figurePanel, BorderLayout.CENTER);
+
+        // Панель настроек
+        JPanel settingsPanel = new JPanel();
+        settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
+
+        JLabel labelSize = new JLabel("Choose size:");
+        JSlider sizeSlider = new JSlider(JSlider.HORIZONTAL, 5, 250, 125);
+        sizeSlider.setMajorTickSpacing(50);
+        sizeSlider.setMinorTickSpacing(25);
+        sizeSlider.setPaintTicks(true);
+        sizeSlider.setPaintLabels(true);
+
+        JLabel labelRotation = new JLabel("Choose rotation:");
+        JSlider rotationSlider = new JSlider(JSlider.HORIZONTAL, 5, 250, 125);
+        rotationSlider.setMajorTickSpacing(50);
+        rotationSlider.setMinorTickSpacing(25);
+        rotationSlider.setPaintTicks(true);
+        rotationSlider.setPaintLabels(true);
+
+        JLabel cornersSize = new JLabel("Choose amount of corners:");
+        JSlider cornersSlider = new JSlider(JSlider.HORIZONTAL, 5, 250, 125);
+        cornersSlider.setMajorTickSpacing(50);
+        cornersSlider.setMinorTickSpacing(25);
+        cornersSlider.setPaintTicks(true);
+        cornersSlider.setPaintLabels(true);
+
+        JLabel radiusRotation = new JLabel("Choose radius:");
+        JSlider radiusSlider = new JSlider(JSlider.HORIZONTAL, 0, 720, 0);
+        radiusSlider.setMajorTickSpacing(90);
+        radiusSlider.setMinorTickSpacing(30);
+        radiusSlider.setPaintTicks(true);
+        radiusSlider.setPaintLabels(true);
+
+        JButton applyButton = new JButton("Apply");
+        applyButton.addActionListener(e -> {
+
+        });
+
+        JButton okButton = new JButton("Ok");
+        okButton.addActionListener(e -> {
+
+        });
+
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(e -> {
+            figureSetSettingsFrame.dispose();
+        });
+
+        settingsPanel.add(labelSize);
+        settingsPanel.add(sizeSlider);
+        settingsPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        settingsPanel.add(labelRotation);
+        settingsPanel.add(rotationSlider);
+        settingsPanel.add(cornersSize);
+        settingsPanel.add(cornersSlider);
+        settingsPanel.add(radiusRotation);
+        settingsPanel.add(radiusSlider);
+        settingsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        settingsPanel.add(applyButton);
+        settingsPanel.add(okButton);
+        settingsPanel.add(cancelButton);
+
+        mainPanel.add(settingsPanel, BorderLayout.EAST);
+        figureSetSettingsFrame.add(mainPanel);
+        figureSetSettingsFrame.setVisible(true);
+
+
     }
 
     int showPolygonCornersDialog() {
