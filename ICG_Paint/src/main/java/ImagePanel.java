@@ -9,10 +9,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Stack;
 import javax.imageio.ImageIO;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 public class ImagePanel extends JPanel implements MouseListener {
 
+	private JScrollPane scrollPane;
 	private boolean draw = true;
 	private int x, y, xd = -1, yd = -1;
 	private BufferedImage currentImage;
@@ -30,16 +31,21 @@ public class ImagePanel extends JPanel implements MouseListener {
 	public Boolean starExampleMode;
 	public Boolean polygonExampleMode;
 	public Boolean exampleMode;
+	private JLabel imageLabel;
 
 	public ImagePanel() {
 		starExampleMode = false;
 		exampleMode = false;
 		currentImage = new BufferedImage(1000, 700, BufferedImage.TYPE_INT_ARGB);
 		exampleImage = new BufferedImage(1000, 700, BufferedImage.TYPE_INT_ARGB);
+		imageLabel = new JLabel();
+		scrollPane = new JScrollPane(imageLabel);
 		clearExampleImage();
 	}
 
 	public ImagePanel(SelectedSettings selectedSettings, int figureSize, int figureRotate, int figureCorners) {
+		imageLabel = new JLabel();
+		scrollPane = new JScrollPane(imageLabel);
 		starExampleMode = false;
 		polygonExampleMode = false;
 		exampleMode = false;
@@ -62,6 +68,8 @@ public class ImagePanel extends JPanel implements MouseListener {
 
 	public ImagePanel(SelectedSettings selectedSettings) {
 		this();
+		imageLabel = new JLabel();
+		scrollPane = new JScrollPane(imageLabel);
 		starExampleMode = false;
 		polygonExampleMode = false;
 		exampleMode = false;
@@ -94,7 +102,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 	}
 
 	private void bresenhemDrawLine(int x0, int y0, int x1, int y1) {
-		if (currentImage == null) return; // Проверка на null
+		if (currentImage == null) return;
 
 		Graphics2D g2d = currentImage.createGraphics();
 		g2d.setColor(selectedSettings.getCurrentColor());
@@ -168,7 +176,6 @@ public class ImagePanel extends JPanel implements MouseListener {
 			g.drawImage(currentImage, 0, 0, this);
 		}
 		if (starExampleMode || polygonExampleMode) {
-			System.out.println("star");
 			super.paintComponent(g);
 			Graphics2D g2d = (Graphics2D) g;
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -384,13 +391,11 @@ public class ImagePanel extends JPanel implements MouseListener {
 		Color targetColor = this.selectedSettings.getCurrentColor();
 		Color startColor = new Color(currentImage.getRGB(x, y), true);
 		if (startColor.equals(targetColor)) {
-			//System.out.println("Цвета совпадают, заливка не требуется");
 			return;
 		}
 		Stack<int[]> stack = new Stack<>();
 		stack.push(new int[]{x, y});
 
-		// Основной цикл заливки
 		while (!stack.isEmpty()) {
 			int[] span = stack.pop();
 			int startX = span[0];
@@ -428,15 +433,13 @@ public class ImagePanel extends JPanel implements MouseListener {
 		if (x < 0 || y < 0 || x >= currentImage.getWidth() || y >= currentImage.getHeight()) {
 			return false;
 		}
-		Color pixelColor = new Color(currentImage.getRGB(x, y), true); // Учитываем прозрачность
+		Color pixelColor = new Color(currentImage.getRGB(x, y), true);
 		return pixelColor.equals(startColor);
 	}
 
-	// Проверяет строку выше или ниже на наличие пикселей для заливки
 	private void checkSpan(int leftX, int rightX, int y, Color startColor, Stack<int[]> stack) {
 		for (int i = leftX; i <= rightX; i++) {
 			if (isSameColor(i, y, startColor)) {
-				// Начало нового спана
 				int startSpanX = i;
 				while (i <= rightX && isSameColor(i, y, startColor)) {
 					i++;
@@ -447,7 +450,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 	}
 
 	private void drawFunMode(MouseEvent ev) {
-		if (currentImage == null) return; // Проверка на null
+		if (currentImage == null) return;
 
 		int currentX = ev.getX();
 		int currentY = ev.getY();
@@ -609,6 +612,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 	public void openImage(String filePath) {
 		try {
 			currentImage = ImageIO.read(new File(filePath));
+			imageLabel.setIcon(new ImageIcon(currentImage));
 			repaint();
 		} catch (IOException e) {
 			e.printStackTrace();

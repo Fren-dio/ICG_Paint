@@ -44,7 +44,7 @@ public class ToolBarMenu extends JToolBar {
         JButton clearBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("clear_icon.jpg"))));
         setSizeSquareBtn(clearBtn, btnSize);
         clearBtn.setToolTipText("Clear all area.");
-        clearBtn.addActionListener(ev -> this.imagePanel.clear());
+        clearBtn.addActionListener(ev -> imagePanel.clear());
         this.add(clearBtn);
 
 

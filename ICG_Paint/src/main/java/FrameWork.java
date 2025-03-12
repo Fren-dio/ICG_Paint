@@ -201,7 +201,7 @@ public class FrameWork extends JFrame
 		});
 
 		MainMenuPanel clearMenu = new MainMenuPanel("Clean");
-		clearMenu.addMenuItem("Clean", () -> this.imagePanel.clear());
+		clearMenu.addMenuItem("Clean", () -> imagePanel.clear());
 
 		// Добавляем пункты меню в меню бар
 		menuBar.add(aboutMenu);
