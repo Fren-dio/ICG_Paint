@@ -1,6 +1,4 @@
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -264,11 +262,13 @@ public class ToolBarMenu extends JToolBar {
         polygonBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                imagePanel.starExampleMode = true;
                 int corners = showPolygonCornersDialog();
-                if (corners != -1) {
+                if (corners >= 3) {
                     createChosenWindow(corners, "Polygon Settings");
                     selectedSettings.setFigurePatternMode(corners);
                 }
+                imagePanel.starExampleMode = false;
             }
         });
         patternsGrid.add(polygonBtn);
@@ -295,34 +295,35 @@ public class ToolBarMenu extends JToolBar {
         ImagePanel figurePanel = new ImagePanel(selectedSettings, 100, 0, corners);
         figurePanel.setPreferredSize(new Dimension(formSizeW - 200, formSizeH));
         mainPanel.add(figurePanel, BorderLayout.CENTER);
+        figurePanel.setStarExampleValue(true);
 
         // Панель настроек
         JPanel settingsPanel = new JPanel();
         settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
 
-        JLabel labelSize = new JLabel("Choose size:");
-        JSlider sizeSlider = new JSlider(JSlider.HORIZONTAL, 5, 250, 125);
+        JSlider sizeSlider = new JSlider(JSlider.HORIZONTAL, 5, 200, 100);
+        JLabel labelSize = new JLabel("Choose size: " + sizeSlider.getValue());
         sizeSlider.setMajorTickSpacing(50);
         sizeSlider.setMinorTickSpacing(25);
         sizeSlider.setPaintTicks(true);
         sizeSlider.setPaintLabels(true);
 
-        JLabel labelRotation = new JLabel("Choose rotation:");
         JSlider rotationSlider = new JSlider(JSlider.HORIZONTAL, 5, 250, 125);
+        JLabel labelRotation = new JLabel("Choose rotation:" + rotationSlider.getValue());
         rotationSlider.setMajorTickSpacing(50);
         rotationSlider.setMinorTickSpacing(25);
         rotationSlider.setPaintTicks(true);
         rotationSlider.setPaintLabels(true);
 
-        JLabel cornersSize = new JLabel("Choose amount of corners:");
-        JSlider cornersSlider = new JSlider(JSlider.HORIZONTAL, 5, 250, 125);
+        JSlider cornersSlider = new JSlider(JSlider.HORIZONTAL, 3, 50, 5);
+        JLabel cornersSize = new JLabel("Choose amount of corners:" + cornersSlider.getValue());
         cornersSlider.setMajorTickSpacing(50);
         cornersSlider.setMinorTickSpacing(25);
         cornersSlider.setPaintTicks(true);
         cornersSlider.setPaintLabels(true);
 
-        JLabel radiusRotation = new JLabel("Choose radius:");
-        JSlider radiusSlider = new JSlider(JSlider.HORIZONTAL, 0, 720, 0);
+        JSlider radiusSlider = new JSlider(JSlider.HORIZONTAL, 0, 220, 0);
+        JLabel radiusRotation = new JLabel("Choose radius:" + radiusSlider.getValue());
         radiusSlider.setMajorTickSpacing(90);
         radiusSlider.setMinorTickSpacing(30);
         radiusSlider.setPaintTicks(true);
@@ -330,12 +331,13 @@ public class ToolBarMenu extends JToolBar {
 
         JButton applyButton = new JButton("Apply");
         applyButton.addActionListener(e -> {
-
+            figurePanel.repaint();
         });
 
         JButton okButton = new JButton("Ok");
         okButton.addActionListener(e -> {
-
+            selectedSettings.setStarMode();
+            figureSetSettingsFrame.dispose();
         });
 
         JButton cancelButton = new JButton("Cancel");
@@ -356,6 +358,31 @@ public class ToolBarMenu extends JToolBar {
         settingsPanel.add(applyButton);
         settingsPanel.add(okButton);
         settingsPanel.add(cancelButton);
+
+        sizeSlider.addChangeListener(e -> {
+            labelSize.setText("Choose size: " + sizeSlider.getValue());
+            figurePanel.setStarParamsSize(sizeSlider.getValue());
+            figurePanel.repaint();
+        });
+
+        rotationSlider.addChangeListener(e -> {
+            labelRotation.setText("Choose rotation:" + rotationSlider.getValue());
+            figurePanel.setStarParamsRotate(rotationSlider.getValue());
+            figurePanel.repaint();
+        });
+
+        cornersSlider.addChangeListener(e -> {
+            cornersSize.setText("Choose amount of corners:" + cornersSlider.getValue());
+            figurePanel.setStarParamsCorners(cornersSlider.getValue());
+            figurePanel.repaint();
+        });
+
+        radiusSlider.addChangeListener(e -> {
+            radiusRotation.setText("Choose radius:" + radiusSlider.getValue());
+            figurePanel.setStarParamsRadius(radiusSlider.getValue());
+            figurePanel.repaint();
+        });
+
 
         mainPanel.add(settingsPanel, BorderLayout.EAST);
         figureSetSettingsFrame.add(mainPanel);
@@ -444,6 +471,7 @@ public class ToolBarMenu extends JToolBar {
         ImagePanel figurePanel = new ImagePanel(selectedSettings, 100, 0, corners);
         figurePanel.setPreferredSize(new Dimension(formSizeW - 200, formSizeH));
         mainPanel.add(figurePanel, BorderLayout.CENTER);
+        figurePanel.setPolygonExampleValue(true);
 
         // Панель настроек
         JPanel settingsPanel = new JPanel();
@@ -499,17 +527,24 @@ public class ToolBarMenu extends JToolBar {
         mainPanel.add(settingsPanel, BorderLayout.EAST);
         figureSetSettingsFrame.add(mainPanel);
 
-        // Обработчик изменений слайдеров
-        ChangeListener updateListener = new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                int size = sizeSlider.getValue();
-                int rotation = rotationSlider.getValue();
-                figurePanel.setFigureParameters(size, rotation, corners);
-            }
-        };
-        sizeSlider.addChangeListener(updateListener);
-        rotationSlider.addChangeListener(updateListener);
+
+        sizeSlider.addChangeListener(e -> {
+            labelSize.setText("Choose size: " + sizeSlider.getValue());
+            figurePanel.setPolygonSize(sizeSlider.getValue());
+            selectedSettings.setFigureSize(sizeSlider.getValue());
+            selectedSettings.setFigureMode();
+            figurePanel.repaint();
+        });
+
+
+        rotationSlider.addChangeListener(e -> {
+            labelRotation.setText("Choose rotation: " + rotationSlider.getValue());
+            figurePanel.setPolygonRotate(rotationSlider.getValue());
+            selectedSettings.setFigureRotate(rotationSlider.getValue());
+            selectedSettings.setFigurePatternMode(corners);
+            figurePanel.repaint();
+        });
+
 
         // Отображаем окно
         figureSetSettingsFrame.setVisible(true);

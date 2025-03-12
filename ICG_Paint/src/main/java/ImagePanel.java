@@ -3,6 +3,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -26,13 +27,22 @@ public class ImagePanel extends JPanel implements MouseListener {
 
 	private BufferedImage exampleImage; // Изображение для примера фигуры
 
+	public Boolean starExampleMode;
+	public Boolean polygonExampleMode;
+	public Boolean exampleMode;
+
 	public ImagePanel() {
+		starExampleMode = false;
+		exampleMode = false;
 		currentImage = new BufferedImage(1000, 700, BufferedImage.TYPE_INT_ARGB);
 		exampleImage = new BufferedImage(1000, 700, BufferedImage.TYPE_INT_ARGB);
 		clearExampleImage();
 	}
 
 	public ImagePanel(SelectedSettings selectedSettings, int figureSize, int figureRotate, int figureCorners) {
+		starExampleMode = false;
+		polygonExampleMode = false;
+		exampleMode = false;
 		this.selectedSettings = selectedSettings;
 		this.FIGURE_SIZE = figureSize;
 		this.FIGURE_ROTATE = figureRotate;
@@ -52,6 +62,9 @@ public class ImagePanel extends JPanel implements MouseListener {
 
 	public ImagePanel(SelectedSettings selectedSettings) {
 		this();
+		starExampleMode = false;
+		polygonExampleMode = false;
+		exampleMode = false;
 		this.areSettingForm = false;
 		this.selectedSettings = selectedSettings;
 		addMouseListener(this);
@@ -86,6 +99,8 @@ public class ImagePanel extends JPanel implements MouseListener {
 		Graphics2D g2d = currentImage.createGraphics();
 		g2d.setColor(selectedSettings.getCurrentColor());
 
+		int x = x0;
+		int y = y0;
 		int dx = Math.abs(x1 - x0);
 		int dy = Math.abs(y1 - y0);
 
@@ -94,19 +109,22 @@ public class ImagePanel extends JPanel implements MouseListener {
 
 		int err = dx - dy;
 
-		while (true) {
-			g2d.fillRect(x0, y0, 1, 1);
-			if (x0 == x1 && y0 == y1) break;
+		for (int i = 0; i <= Math.max(dx, dy); i++) {
+			g2d.fillRect(x, y, 1, 1);
+
+			if (x == x1 && y == y1) break;
+
 			int e2 = 2 * err;
 			if (e2 > -dy) {
 				err -= dy;
-				x0 += sx;
+				x += sx;
 			}
 			if (e2 < dx) {
 				err += dx;
-				y0 += sy;
+				y += sy;
 			}
 		}
+
 		g2d.dispose();
 		repaint();
 	}
@@ -128,6 +146,19 @@ public class ImagePanel extends JPanel implements MouseListener {
 	}
 
 
+	public void setStarExampleValue(boolean value){
+		this.starExampleMode = value;
+	}
+
+
+	public void setPolygonExampleValue(boolean value){
+		this.polygonExampleMode = value;
+	}
+
+	public void setExamplePolygonValue(boolean value){
+		this.exampleMode = value;
+	}
+
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -136,11 +167,162 @@ public class ImagePanel extends JPanel implements MouseListener {
 		if (currentImage != null) {
 			g.drawImage(currentImage, 0, 0, this);
 		}
+		if (starExampleMode || polygonExampleMode) {
+			System.out.println("star");
+			super.paintComponent(g);
+			Graphics2D g2d = (Graphics2D) g;
+			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+			int centerX = getWidth() / 2;
+			int centerY = getHeight() / 2;
+
+			// Рисуем звезду
+			if (starExampleMode)
+				drawStar(g2d, centerX, centerY, selectedSettings.getStarSize(),
+					selectedSettings.getStarRadius(), selectedSettings.getStarCorners(), selectedSettings.getStarRotate());
+			if (polygonExampleMode) {
+				drawFigure(g2d, centerX, centerY, selectedSettings.getFigureSize(),
+						selectedSettings.getFigureCorners(), selectedSettings.getFigureRotate());
+			}
+		}
+		if (exampleMode) {
+			super.paintComponent(g);
+			drawExampleFigure();
+		}
 	}
+
+	public void setPolygonSize(int value) {
+		selectedSettings.setFigureSize(value);
+	}
+
+	public void setPolygonRotate(int value) {
+		selectedSettings.setFigureRotate(value);
+	}
+
+	public void setStarParamsSize(int value) {
+		selectedSettings.setStarSize(value);
+	}
+
+
+	public void setStarParamsRotate(int value) {
+		selectedSettings.setStarRotate(value);
+	}
+
+	public void setStarParamsRadius(int value) {
+		selectedSettings.setStarRadius(value);
+	}
+
+	public void setStarParamsCorners(int value) {
+		selectedSettings.setStarCorners(value);
+	}
+
+	public static void drawFigure(){
+
+	}
+
+	private void drawFigureGraphic(int currentX, int currentY, int size, int rotate, int corners) {
+
+		Graphics2D g2d = this.currentImage.createGraphics();
+		g2d.setColor(selectedSettings.getCurrentColor());
+		g2d.setStroke(new BasicStroke(selectedSettings.getCurrentWeight()));
+
+		if (currentImage == null) {
+			System.out.println("currentImage is null");
+			return;
+		}
+
+		int[] xPoints = new int[corners];
+		int[] yPoints = new int[corners];
+
+		double angleStep = 2 * Math.PI / corners;
+
+		for (int i = 0; i < corners; i++) {
+			double angle = i * angleStep;
+			xPoints[i] = (int) (currentX + size / 2 * Math.cos(angle));
+			yPoints[i] = (int) (currentY + size / 2 * Math.sin(angle));
+		}
+
+		int[] xPointsRotated = new int[xPoints.length];
+		int[] yPointsRotated = new int[yPoints.length];
+
+		double radians = Math.toRadians(rotate);
+		for (int i = 0; i < xPoints.length; i++) {
+			int x = xPoints[i] - currentX;
+			int y = yPoints[i] - currentY;
+			xPointsRotated[i] = (int) (x * Math.cos(radians) - y * Math.sin(radians) + currentX);
+			yPointsRotated[i] = (int) (x * Math.sin(radians) + y * Math.cos(radians) + currentY);
+		}
+
+		for (int i = 0; i < corners; i++) {
+			int nextIndex = (i + 1) % corners; // Следующая вершина (с замыканием на первую)
+			myDrawLine(g2d, xPointsRotated[i], yPointsRotated[i],
+					xPointsRotated[nextIndex], yPointsRotated[nextIndex], selectedSettings.getCurrentWeight());
+		}
+		g2d.dispose();
+		repaint();
+	}
+
+	public static void drawStar(Graphics2D g2d, int centerX, int centerY, int outerRadius, int innerRadius, int n, int rotationAngle) {
+		Path2D.Double star = new Path2D.Double();
+
+		double angleStep = Math.PI / n;
+
+		double angle = -Math.PI / 2 + rotationAngle;
+		double x = centerX + outerRadius * Math.cos(angle);
+		double y = centerY + outerRadius * Math.sin(angle);
+		star.moveTo(x, y);
+
+		// Добавляем остальные вершины
+		for (int i = 1; i <= 2 * n; i++) {
+			angle += angleStep;
+			double radius = (i % 2 == 0) ? outerRadius : innerRadius;
+			x = centerX + radius * Math.cos(angle);
+			y = centerY + radius * Math.sin(angle);
+			star.lineTo(x, y);
+		}
+
+		// Замыкаем путь
+		star.closePath();
+
+		// Рисуем звезду
+		g2d.draw(star);
+	}
+
 
 
 	public void clean() {
 		draw = !draw;
+		repaint();
+	}
+
+
+	private void drawStarGraphic(int centerX, int centerY, int outerRadius, int innerRadius, int n, int rotationAngle) {
+		Graphics2D g2d = this.currentImage.createGraphics();
+		g2d.setColor(selectedSettings.getCurrentColor());
+		g2d.setStroke(new BasicStroke(selectedSettings.getCurrentWeight()));
+		Path2D.Double star = new Path2D.Double();
+
+		double angleStep = Math.PI / n;
+
+		double angle = -Math.PI / 2 + rotationAngle;
+		double x = centerX + outerRadius * Math.cos(angle);
+		double y = centerY + outerRadius * Math.sin(angle);
+		star.moveTo(x, y);
+
+		// Добавляем остальные вершины
+		for (int i = 1; i <= 2 * n; i++) {
+			angle += angleStep;
+			double radius = (i % 2 == 0) ? outerRadius : innerRadius;
+			x = centerX + radius * Math.cos(angle);
+			y = centerY + radius * Math.sin(angle);
+			star.lineTo(x, y);
+		}
+
+		// Замыкаем путь
+		star.closePath();
+
+		// Рисуем звезду
+		g2d.draw(star);
 		repaint();
 	}
 
@@ -182,10 +364,15 @@ public class ImagePanel extends JPanel implements MouseListener {
 		}
 
 		if (selectedSettings.getCurrentMode().equals("FIGURE_MODE")) {
-			drawFigure(ev);
+			drawFigureGraphic(ev.getX(), ev.getY(), selectedSettings.getFigureSize(),
+					selectedSettings.getFigureRotate(), selectedSettings.getFigureCorners());
 		}
 		if (selectedSettings.getCurrentMode().equals("FILL_MODE")) {
 			spanFill(ev.getX(), ev.getY());
+		}
+		if(selectedSettings.getCurrentMode().equals("STAR_MODE")) {
+			drawStarGraphic(ev.getX(), ev.getY(), selectedSettings.getStarSize(),
+					selectedSettings.getStarRadius(), selectedSettings.getStarCorners(), selectedSettings.getStarRotate());
 		}
 	}
 
@@ -194,20 +381,12 @@ public class ImagePanel extends JPanel implements MouseListener {
 			System.out.println("BufferedImage is null");
 			return;
 		}
-
-		// Получаем цвет заливки
 		Color targetColor = this.selectedSettings.getCurrentColor();
-
-		// Получаем цвет начальной точки
-		Color startColor = new Color(currentImage.getRGB(x, y), true); // Учитываем прозрачность
-
-		// Если цвет заливки совпадает с начальным цветом, заливка не требуется
+		Color startColor = new Color(currentImage.getRGB(x, y), true);
 		if (startColor.equals(targetColor)) {
 			//System.out.println("Цвета совпадают, заливка не требуется");
 			return;
 		}
-
-		// Стек для хранения точек, которые нужно обработать
 		Stack<int[]> stack = new Stack<>();
 		stack.push(new int[]{x, y});
 
@@ -217,7 +396,6 @@ public class ImagePanel extends JPanel implements MouseListener {
 			int startX = span[0];
 			int currentY = span[1];
 
-			// Находим начало и конец спана
 			int leftX = startX;
 			while (leftX >= 0 && isSameColor(leftX, currentY, startColor)) {
 				leftX--;
@@ -230,31 +408,25 @@ public class ImagePanel extends JPanel implements MouseListener {
 			}
 			rightX--;
 
-			// Закрашиваем спан
 			Graphics2D g2d = currentImage.createGraphics();
 			g2d.setColor(targetColor);
 			g2d.drawLine(leftX, currentY, rightX, currentY);
 			g2d.dispose();
 
-			// Проверяем строку выше
 			if (currentY > 0) {
 				checkSpan(leftX, rightX, currentY - 1, startColor, stack);
 			}
-
-			// Проверяем строку ниже
 			if (currentY < currentImage.getHeight() - 1) {
 				checkSpan(leftX, rightX, currentY + 1, startColor, stack);
 			}
 		}
 
-		// Перерисовываем панель
 		repaint();
 	}
 
-	// Проверяет, совпадает ли цвет пикселя с начальным цветом
 	private boolean isSameColor(int x, int y, Color startColor) {
 		if (x < 0 || y < 0 || x >= currentImage.getWidth() || y >= currentImage.getHeight()) {
-			return false; // Выход за границы изображения
+			return false;
 		}
 		Color pixelColor = new Color(currentImage.getRGB(x, y), true); // Учитываем прозрачность
 		return pixelColor.equals(startColor);
@@ -339,50 +511,32 @@ public class ImagePanel extends JPanel implements MouseListener {
 	}
 
 
-	private void drawFigure(MouseEvent ev) {
-		if (currentImage == null) {
-			System.out.println("currentImage is null");
-			return;
-		}
+	private void drawFigure(Graphics2D g2d, int currentX, int currentY, int size, int corners, int rotationAngle) {
+		Path2D.Double polygon = new Path2D.Double();
 
-		int currentX = ev.getX();
-		int currentY = ev.getY();
-		int corners = this.selectedSettings.getFigureCorners();
-		int size = this.selectedSettings.getFigureSize();
-
-		int[] xPoints = new int[corners];
-		int[] yPoints = new int[corners];
-
+		// Угловой шаг между вершинами
 		double angleStep = 2 * Math.PI / corners;
 
-		for (int i = 0; i < corners; i++) {
-			double angle = i * angleStep;
-			xPoints[i] = (int) (currentX + size / 2 * Math.cos(angle));
-			yPoints[i] = (int) (currentY + size / 2 * Math.sin(angle));
+		// Начинаем с первой вершины
+		double angle = -Math.PI / 2 + Math.toRadians(rotationAngle); // Начинаем с верхней вершины и добавляем угол поворота
+		double x = currentX + size * Math.cos(angle);
+		double y = currentY + size * Math.sin(angle);
+		polygon.moveTo(x, y);
+
+		// Добавляем остальные вершины
+		for (int i = 1; i < corners; i++) {
+			angle += angleStep;
+			x = currentX + size * Math.cos(angle);
+			y = currentY + size * Math.sin(angle);
+			polygon.lineTo(x, y);
 		}
 
-		int[] xPointsRotated = new int[xPoints.length];
-		int[] yPointsRotated = new int[yPoints.length];
+		polygon.closePath();
 
-		double radians = Math.toRadians(this.selectedSettings.getFigureRotate());
-		for (int i = 0; i < xPoints.length; i++) {
-			int x = xPoints[i] - currentX;
-			int y = yPoints[i] - currentY;
-			xPointsRotated[i] = (int) (x * Math.cos(radians) - y * Math.sin(radians) + currentX);
-			yPointsRotated[i] = (int) (x * Math.sin(radians) + y * Math.cos(radians) + currentY);
-		}
-
-		Graphics2D g2d = currentImage.createGraphics();
-		for (int i = 0; i < corners; i++) {
-			int nextIndex = (i + 1) % corners; // Следующая вершина (с замыканием на первую)
-			myDrawLine(g2d, xPointsRotated[i], yPointsRotated[i],
-					xPointsRotated[nextIndex], yPointsRotated[nextIndex], selectedSettings.getCurrentWeight());
-		}
-		g2d.dispose();
-		repaint();
-
-		repaint();
+		// Рисуем многоугольник
+		g2d.draw(polygon);
 	}
+
 
 	public void drawExample() {
 		if (currentImage == null) {
