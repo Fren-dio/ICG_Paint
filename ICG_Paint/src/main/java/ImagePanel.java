@@ -24,9 +24,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 	private int FIGURE_SIZE;
 	private int FIGURE_ROTATE;
 	private int FIGURE_COUNT_CORNER;
-	public Boolean areSettingForm;
-
-	private BufferedImage exampleImage; // Изображение для примера фигуры
+	private BufferedImage exampleImage;
 
 	public Boolean starExampleMode;
 	public Boolean polygonExampleMode;
@@ -73,7 +71,6 @@ public class ImagePanel extends JPanel implements MouseListener {
 		starExampleMode = false;
 		polygonExampleMode = false;
 		exampleMode = false;
-		this.areSettingForm = false;
 		this.selectedSettings = selectedSettings;
 		addMouseListener(this);
 
@@ -105,7 +102,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 		if (currentImage == null) return;
 
 		Graphics2D g2d = currentImage.createGraphics();
-		g2d.setColor(selectedSettings.getCurrentColor());
+		g2d.setColor((selectedSettings.getCurrentColor()));
 
 		int x = x0;
 		int y = y0;
@@ -118,7 +115,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 		int err = dx - dy;
 
 		for (int i = 0; i <= Math.max(dx, dy); i++) {
-			g2d.fillRect(x, y, 1, 1);
+			currentImage.setRGB(x, y, (selectedSettings.getCurrentColor()).getRGB());
 
 			if (x == x1 && y == y1) break;
 
@@ -148,7 +145,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 
 	private void clearExampleImage() {
 		Graphics2D g2d = exampleImage.createGraphics();
-		g2d.setColor(getBackground()); // Заливаем фоновым цветом
+		g2d.setColor(getBackground());
 		g2d.fillRect(0, 0, exampleImage.getWidth(), exampleImage.getHeight());
 		g2d.dispose();
 	}
@@ -163,15 +160,10 @@ public class ImagePanel extends JPanel implements MouseListener {
 		this.polygonExampleMode = value;
 	}
 
-	public void setExamplePolygonValue(boolean value){
-		this.exampleMode = value;
-	}
-
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
-		// Отрисовка основного изображения
 		if (currentImage != null) {
 			g.drawImage(currentImage, 0, 0, this);
 		}
@@ -183,7 +175,6 @@ public class ImagePanel extends JPanel implements MouseListener {
 			int centerX = getWidth() / 2;
 			int centerY = getHeight() / 2;
 
-			// Рисуем звезду
 			if (starExampleMode)
 				drawStar(g2d, centerX, centerY, selectedSettings.getStarSize(),
 					selectedSettings.getStarRadius(), selectedSettings.getStarCorners(), selectedSettings.getStarRotate());
@@ -221,10 +212,6 @@ public class ImagePanel extends JPanel implements MouseListener {
 
 	public void setStarParamsCorners(int value) {
 		selectedSettings.setStarCorners(value);
-	}
-
-	public static void drawFigure(){
-
 	}
 
 	private void drawFigureGraphic(int currentX, int currentY, int size, int rotate, int corners) {
@@ -357,7 +344,8 @@ public class ImagePanel extends JPanel implements MouseListener {
 		if (currentImage == null) return; // Проверка на null
 
 		if (selectedSettings.getCurrentMode().equals("STRAIGHT_LINE_MODE")) {
-			if (selectedSettings.getCurrentWeight() > 1) {
+			System.out.println(selectedSettings.getCurrentWeight());
+			if (selectedSettings.getCurrentWeight() == 1) {
 				bresenhemDrawLine(x, y, ev.getX(), ev.getY());
 			} else {
 				Graphics2D g2d = currentImage.createGraphics();
@@ -388,9 +376,11 @@ public class ImagePanel extends JPanel implements MouseListener {
 			System.out.println("BufferedImage is null");
 			return;
 		}
-		Color targetColor = this.selectedSettings.getCurrentColor();
-		Color startColor = new Color(currentImage.getRGB(x, y), true);
-		if (startColor.equals(targetColor)) {
+		Graphics2D g2d = currentImage.createGraphics();
+		g2d.setColor(selectedSettings.getCurrentColor());
+		int targetColor = this.selectedSettings.getCurrentColor().getRGB();
+		int startColor = currentImage.getRGB(x, y);
+		if (startColor == (targetColor)) {
 			return;
 		}
 		Stack<int[]> stack = new Stack<>();
@@ -413,31 +403,30 @@ public class ImagePanel extends JPanel implements MouseListener {
 			}
 			rightX--;
 
-			Graphics2D g2d = currentImage.createGraphics();
-			g2d.setColor(targetColor);
-			g2d.drawLine(leftX, currentY, rightX, currentY);
-			g2d.dispose();
+			for (int p=leftX; p<=rightX; p++)
+				currentImage.setRGB(p, currentY, (selectedSettings.getCurrentColor()).getRGB());
 
 			if (currentY > 0) {
 				checkSpan(leftX, rightX, currentY - 1, startColor, stack);
 			}
-			if (currentY < currentImage.getHeight() - 1) {
+			if (currentY < currentImage.getHeight() - 1)
 				checkSpan(leftX, rightX, currentY + 1, startColor, stack);
-			}
+
 		}
 
+		g2d.dispose();
 		repaint();
 	}
 
-	private boolean isSameColor(int x, int y, Color startColor) {
+	private boolean isSameColor(int x, int y, int startColor) {
 		if (x < 0 || y < 0 || x >= currentImage.getWidth() || y >= currentImage.getHeight()) {
 			return false;
 		}
-		Color pixelColor = new Color(currentImage.getRGB(x, y), true);
-		return pixelColor.equals(startColor);
+		int pixelColor = currentImage.getRGB(x, y);
+		return (pixelColor == startColor);
 	}
 
-	private void checkSpan(int leftX, int rightX, int y, Color startColor, Stack<int[]> stack) {
+	private void checkSpan(int leftX, int rightX, int y, int startColor, Stack<int[]> stack) {
 		for (int i = leftX; i <= rightX; i++) {
 			if (isSameColor(i, y, startColor)) {
 				int startSpanX = i;
@@ -589,7 +578,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 	private void myDrawLine(Graphics2D g, int x1, int y1, int x2, int y2, int weight) {
 		g.setColor(selectedSettings.getCurrentColor());
 		g.setStroke(new BasicStroke(weight));
-		g.draw(new Line2D.Float(x1, y1, x2, y2));
+		g.drawLine(x1, y1, x2, y2);
 	}
 
 	public void getMessage(String typeOfMsg, String text, String title) {

@@ -19,6 +19,8 @@ public class ToolBarMenu extends JToolBar {
 
         // Кнопка для прямой линии
         JButton lineBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("line_icon.jpg"))));
+        if (lineBtn.isSelected())
+            lineBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("waved_line_icon.jpg"))));
         setSizeSquareBtn(lineBtn, btnSize);
         lineBtn.setToolTipText("Draw straight line.");
         lineBtn.addActionListener(e -> selectedSettings.setStraightLineMode());
@@ -89,6 +91,18 @@ public class ToolBarMenu extends JToolBar {
         setDimensionBtn(boldWeightLineBtn, weightBtnSize);
         boldWeightLineBtn.addActionListener(e -> selectedSettings.setBoldWeight());
         weightsGrid.add(boldWeightLineBtn);
+
+        JButton otherWeightLineBtn = new JButton("?");
+        otherWeightLineBtn.setBackground(new Color(255, 255, 255));
+        otherWeightLineBtn.setToolTipText("Set your own line weight.");
+        setDimensionBtn(otherWeightLineBtn, weightBtnSize);
+        otherWeightLineBtn.addActionListener(e -> {
+            int weight = showBoldsDialog();
+            if (weight >= 1) {
+                selectedSettings.setWeight(weight);
+            }
+        });
+        weightsGrid.add(otherWeightLineBtn);
 
         this.add(weightsGrid);
         this.addSeparator();
@@ -178,6 +192,45 @@ public class ToolBarMenu extends JToolBar {
         this.setFloatable(false);
         this.setRollover(false);
         this.add(Box.createGlue());
+    }
+
+    int showBoldsDialog() {
+        Integer selected = null;
+
+        while (selected == null) {
+            String input = JOptionPane.showInputDialog(
+                    this,
+                    "Enter the bold of line (1-20):",
+                    "Bold of line",
+                    JOptionPane.QUESTION_MESSAGE
+            );
+
+            // Если пользователь нажал "Отмена" или закрыл окно
+            if (input == null) {
+                break;
+            }
+            try {
+                selected = Integer.parseInt(input);
+                if (selected < 1 || selected > 20) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Please enter a number between 1 and 20.",
+                            "Invalid Input",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    selected = null;
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Invalid input. Please enter a valid integer.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
+
+        return (selected != null) ? selected : -1;
     }
 
     private void createPatternsGrid(JPanel patternsGrid) {
@@ -409,7 +462,6 @@ public class ToolBarMenu extends JToolBar {
         return (selectedCorners != null) ? selectedCorners : -1;
     }
 
-    // Метод для создания цветной кнопки
     private JButton createColorButton(Color color) {
         JButton button = new JButton("");
         setDimensionBtn(button, new Dimension(btnSize / 2, btnSize / 2));
@@ -433,21 +485,6 @@ public class ToolBarMenu extends JToolBar {
         btn.setMaximumSize(dim);
 
         return btn;
-    }
-
-    private JFrame setPatternsSettingsFrame(JFrame frame) {
-        int minSelecterWidth = 300;
-        int minSelecterHeight = 400;
-        frame.setPreferredSize(new Dimension(minSelecterWidth, minSelecterHeight));
-        frame.setMinimumSize(new Dimension(minSelecterWidth, minSelecterHeight));
-        frame.setResizable(false);
-
-        //set window's position
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setLocation((int)((screenSize.getWidth()- minSelecterWidth)/2),
-                (int)((screenSize.getHeight()- minSelecterHeight)/2));
-
-        return frame;
     }
 
     void createChosenWindow(int corners, String formName) {
@@ -545,8 +582,6 @@ public class ToolBarMenu extends JToolBar {
             figurePanel.repaint();
         });
 
-
-        // Отображаем окно
         figureSetSettingsFrame.setVisible(true);
         figureSetSettingsFrame.addWindowListener(new WindowAdapter() {
             @Override

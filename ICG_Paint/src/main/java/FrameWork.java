@@ -90,16 +90,11 @@ public class FrameWork extends JFrame
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setDialogTitle("Open File");
 			fileChooser.setCurrentDirectory(new File("C:/Users/kulma/IdeaProjects/ICG_Paint/images"));
-
-			// Добавляем фильтры для форматов файлов
 			fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Image Files", "png", "jpg", "jpeg", "bmp", "gif"));
-
 			int userSelection = fileChooser.showOpenDialog(this);
-
 			if (userSelection == JFileChooser.APPROVE_OPTION) {
 				File fileToOpen = fileChooser.getSelectedFile();
 				imagePanel.openImage(fileToOpen.getAbsolutePath());
-
 			}
 		});
 
@@ -108,21 +103,16 @@ public class FrameWork extends JFrame
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setDialogTitle("Save As");
 			fileChooser.setCurrentDirectory(new File("C:/Users/kulma/IdeaProjects/ICG_Paint/images"));
-
 			// Добавляем фильтры для форматов файлов
 			fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("PNG Images", "png"));
-
 			int userSelection = fileChooser.showSaveDialog(this);
-
 			if (userSelection == JFileChooser.APPROVE_OPTION) {
 				File fileToSave = fileChooser.getSelectedFile();
 				String filePath = fileToSave.getAbsolutePath();
-
 				// Убедимся, что файл имеет правильное расширение
 				if (!filePath.toLowerCase().endsWith(".png")) {
 					filePath += ".png";
 				}
-
 				imagePanel.saveAsImage(filePath, "png");
 			}
 		});
@@ -130,13 +120,11 @@ public class FrameWork extends JFrame
 		fileMenu.addSeparator(); // Добавляем разделитель
 		fileMenu.addMenuItem("Exit", () -> System.exit(0)); // Выход из программы
 
-
 		MainMenuPanel toolsMenu = new MainMenuPanel("Modes");
 		toolsMenu.addMenuItem("Straight line", () -> selectedSettings.setStraightLineMode());
 		toolsMenu.addMenuItem("Waved line", () -> selectedSettings.setWavedLineMode());
 		toolsMenu.addMenuItem("Fun mode", () -> selectedSettings.setFunPatternMode());
 		toolsMenu.addMenuItem("Fill mode", () -> selectedSettings.setFillMode());
-
 
 		MainMenuPanel colorsMenu = new MainMenuPanel("Colors");
 		colorsMenu.addMenuItem("Red", () -> selectedSettings.setCurrentColor(new Color(255, 0, 0)));
@@ -153,7 +141,6 @@ public class FrameWork extends JFrame
 						"Choose a Color",
 						null
 				);
-
 				// Если пользователь выбрал цвет (не нажал "Cancel")
 				if (selectedColor != null) {
 					selectedSettings.setCurrentColor(selectedColor); // Обновляем цвет в ColorHolder
@@ -164,7 +151,6 @@ public class FrameWork extends JFrame
 		boldsMenu.addMenuItem("Light", () -> selectedSettings.setLightWeight());
 		boldsMenu.addMenuItem("Medium", () -> selectedSettings.setMediumWeight());
 		boldsMenu.addMenuItem("Bold", () -> selectedSettings.setBoldWeight());
-
 
 		MainMenuPanel patternsMenu = new MainMenuPanel("Patterns");
 		patternsMenu.addMenuItem("Triangle", () -> {

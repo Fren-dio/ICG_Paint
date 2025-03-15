@@ -11,8 +11,6 @@ public class SelectedSettings {
 
     private Boolean FILL_MODE;
 
-    public int LIGHT_LINE_WEIGHT = 1;
-
     private Color currentColor;
 
     private int FIGURE_SIZE;
@@ -127,6 +125,10 @@ public class SelectedSettings {
 
     public void setBoldWeight(){
         this.LINE_WEIGHT_RANGE = 6;
+    }
+
+    public void setWeight(int weight){
+        this.LINE_WEIGHT_RANGE = weight;
     }
 
     public void setFigureSettings(int size, int rotate){
