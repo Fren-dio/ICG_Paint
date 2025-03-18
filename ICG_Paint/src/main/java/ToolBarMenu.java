@@ -1,13 +1,20 @@
+import Settings.SavedFigureSettings;
+import Settings.SelectedSettings;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Objects;
 
 public class ToolBarMenu extends JToolBar {
 
+    private SavedFigureSettings star;
+    private SavedFigureSettings threeCorners;
+    private SavedFigureSettings fourCorners;
+    private SavedFigureSettings fiveCorners;
+    private SavedFigureSettings sixCorners;
+    private SavedFigureSettings polygon;
     private final int btnSize = 40;
 
     private final ImagePanel imagePanel;
@@ -16,6 +23,14 @@ public class ToolBarMenu extends JToolBar {
     public ToolBarMenu(ImagePanel imagePanel, SelectedSettings selectedSettings) {
         this.imagePanel = imagePanel;
         this.selectedSettings = selectedSettings;
+        this.star = new SavedFigureSettings();
+        this.threeCorners = new SavedFigureSettings();
+        this.fourCorners = new SavedFigureSettings();
+        this.fiveCorners = new SavedFigureSettings();
+        this.sixCorners = new SavedFigureSettings();
+        this.polygon = new SavedFigureSettings();
+
+        setDefaultSettings();
 
         // Кнопка для прямой линии
         JButton lineBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("line_icon.jpg"))));
@@ -194,6 +209,39 @@ public class ToolBarMenu extends JToolBar {
         this.add(Box.createGlue());
     }
 
+    public void setDefaultSettings() {
+        star.setIsStar(true);
+        star.setCorners(5);
+        star.setSize(100);
+        star.setRadius(50);
+        star.setRotate(0);
+
+        threeCorners.setIsStar(false);
+        threeCorners.setRotate(0);
+        threeCorners.setSize(100);
+        threeCorners.setCorners(3);
+
+        fourCorners.setIsStar(false);
+        fourCorners.setRotate(0);
+        fourCorners.setSize(100);
+        fourCorners.setCorners(4);
+
+        fiveCorners.setIsStar(false);
+        fiveCorners.setRotate(0);
+        fiveCorners.setSize(100);
+        fiveCorners.setCorners(5);
+
+        sixCorners.setIsStar(false);
+        sixCorners.setRotate(0);
+        sixCorners.setSize(100);
+        sixCorners.setCorners(6);
+
+        polygon.setIsStar(false);
+        polygon.setRotate(0);
+        polygon.setSize(100);
+        polygon.setCorners(6);
+    }
+
     int showParametrDialog(int lowBarrier, int topBarrier) {
         Integer selected = null;
 
@@ -366,52 +414,6 @@ public class ToolBarMenu extends JToolBar {
         patternsGrid.add(polygonBtn);
     }
 
-    public void createChosenWindowForStar(int corners, String formName) {
-        int formSizeH = 380;
-        int formSizeW = 500;
-        JFrame figureSetSettingsFrame = createFrame(formName, formSizeW, formSizeH);
-
-        JPanel mainPanel = new JPanel(new BorderLayout());
-
-        ImagePanel figurePanel = createFigurePanel(formSizeW, formSizeH, corners);
-        mainPanel.add(figurePanel, BorderLayout.CENTER);
-
-        JPanel settingsPanel = new JPanel();
-        settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
-
-        JSlider sizeSlider = createSlider(0, 200, 100, 50, 25);
-        JTextField sizeTextField = createTextField(sizeSlider);
-        JPanel sizePanel = createSliderPanel("Choose size: ", sizeTextField, sizeSlider);
-        configureSliderListener(sizeSlider, sizeTextField, figurePanel, "size");
-
-        JSlider cornersSlider = createSlider(0, 100, 5, 20, 10);
-        JTextField cornersTextField = createTextField(cornersSlider);
-        JPanel cornersPanel = createSliderPanel("Choose amount of corners:", cornersTextField, cornersSlider);
-        configureSliderListener(cornersSlider, cornersTextField, figurePanel, "corners");
-
-        JSlider rotationSlider = createSlider(0, 1440, 0, 360, 180);
-        JTextField rotationTextField = createTextField(rotationSlider);
-        JPanel rotationPanel = createSliderPanel("Choose rotation:", rotationTextField, rotationSlider);
-        configureSliderListener(rotationSlider, rotationTextField, figurePanel, "rotate");
-
-        JSlider radiusSlider = createSlider(0, 200, 0, 50, 25);
-        JTextField radiusTextField = createTextField(radiusSlider);
-        JPanel radiusPanel = createSliderPanel("Choose radius:", radiusTextField, radiusSlider);
-        configureSliderListener(radiusSlider, radiusTextField, figurePanel, "radius");
-
-        JButton applyButton = createButton("Apply", e -> figurePanel.repaint());
-        JButton okButton = createButton("Ok", e -> {
-            selectedSettings.setStarMode();
-            figureSetSettingsFrame.dispose();
-        });
-        JButton cancelButton = createButton("Cancel", e -> figureSetSettingsFrame.dispose());
-
-        addComponentsToSettingsPanel(settingsPanel, sizePanel, cornersPanel, rotationPanel, radiusPanel, applyButton, okButton, cancelButton);
-
-        mainPanel.add(settingsPanel, BorderLayout.EAST);
-        figureSetSettingsFrame.add(mainPanel);
-        figureSetSettingsFrame.setVisible(true);
-    }
 
     private JFrame createFrame(String title, int width, int height) {
         JFrame frame = new JFrame(title);
@@ -602,6 +604,38 @@ public class ToolBarMenu extends JToolBar {
     public void createChosenWindow(int corners, String formName) {
         int formSizeH = 380;
         int formSizeW = 500;
+
+        if (corners == 3){
+            if (!threeCorners.isApply()) {
+                selectedSettings.setFigureSize(100);
+                selectedSettings.setFigureRotate(0);
+            }
+        }
+        if (corners == 4){
+            if (!fourCorners.isApply()) {
+                selectedSettings.setFigureSize(100);
+                selectedSettings.setFigureRotate(0);
+            }
+        }
+        if (corners == 5){
+            if (!fiveCorners.isApply()) {
+                selectedSettings.setFigureSize(100);
+                selectedSettings.setFigureRotate(0);
+            }
+        }
+        if (corners == 6){
+            if (!sixCorners.isApply()) {
+                selectedSettings.setFigureSize(100);
+                selectedSettings.setFigureRotate(0);
+            }
+        }
+        else {
+            if (!polygon.isApply()) {
+                selectedSettings.setFigureSize(100);
+                selectedSettings.setFigureRotate(0);
+            }
+        }
+
         JFrame figureSetSettingsFrame = createFrame(formName, formSizeW, formSizeH);
 
         JPanel mainPanel = new JPanel(new BorderLayout());
@@ -617,21 +651,122 @@ public class ToolBarMenu extends JToolBar {
         settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
 
         JSlider sizeSlider = createSlider(0, 200, 100, 50, 25);
+        if (corners == 3)
+            if (threeCorners.isApply())
+                sizeSlider.setValue(threeCorners.getSize());
+        if (corners == 4)
+            if (fourCorners.isApply())
+                sizeSlider.setValue(fourCorners.getSize());
+        if (corners == 5)
+            if (fiveCorners.isApply())
+                sizeSlider.setValue(fiveCorners.getSize());
+        if (corners == 6) {
+            if (sixCorners.isApply())
+                sizeSlider.setValue(sixCorners.getSize());
+        }
+        else
+            if (polygon.isApply())
+                sizeSlider.setValue(polygon.getSize());
         JTextField sizeTextField = createTextField(sizeSlider);
         JPanel sizePanel = createSliderPanel("Choose size: ", sizeTextField, sizeSlider);
         configureSliderListenerForPolygon(sizeSlider, sizeTextField, figurePanel, "size");
 
         JSlider rotationSlider = createSlider(0, 1440, 0, 360, 180);
+        if (corners == 3)
+            if (threeCorners.isApply())
+                rotationSlider.setValue(threeCorners.getRotate());
+        if (corners == 4)
+            if (fourCorners.isApply())
+                rotationSlider.setValue(fourCorners.getRotate());
+        if (corners == 5)
+            if (fiveCorners.isApply())
+                rotationSlider.setValue(fiveCorners.getRotate());
+        if (corners == 6) {
+            if (sixCorners.isApply())
+                rotationSlider.setValue(sixCorners.getRotate());
+        }
+        else
+            if (polygon.isApply())
+                rotationSlider.setValue(polygon.getRotate());
         JTextField rotationTextField = createTextField(rotationSlider);
         JPanel rotationPanel = createSliderPanel("Choose rotation:", rotationTextField, rotationSlider);
         configureSliderListenerForPolygon(rotationSlider, rotationTextField, figurePanel, "rotate");
 
-        JButton applyButton = createButton("Apply", e -> figurePanel.repaint());
+        JButton applyButton = createButton("Apply", e -> {
+            if (corners == 3) {
+                threeCorners.setIsStar(false);
+                threeCorners.setApply();
+                threeCorners.setCorners(corners);
+                threeCorners.setSize(sizeSlider.getValue());
+                threeCorners.setRotate(rotationSlider.getValue());
+            }
+            if (corners == 4) {
+                fourCorners.setIsStar(false);
+                fourCorners.setApply();
+                fourCorners.setCorners(corners);
+                fourCorners.setSize(sizeSlider.getValue());
+                fourCorners.setRotate(rotationSlider.getValue());
+            }
+            if (corners == 5) {
+                fiveCorners.setIsStar(false);
+                fiveCorners.setApply();
+                fiveCorners.setCorners(corners);
+                fiveCorners.setSize(sizeSlider.getValue());
+                fiveCorners.setRotate(rotationSlider.getValue());
+            }
+            if (corners == 6) {
+                sixCorners.setIsStar(false);
+                sixCorners.setApply();
+                sixCorners.setCorners(corners);
+                sixCorners.setSize(sizeSlider.getValue());
+                sixCorners.setRotate(rotationSlider.getValue());
+            }
+            else {
+                polygon.setIsStar(false);
+                polygon.setApply();
+                polygon.setCorners(corners);
+                polygon.setSize(sizeSlider.getValue());
+                polygon.setRotate(rotationSlider.getValue());
+            }
+            figurePanel.repaint();
+        });
         JButton okButton = createButton("Ok", e -> {
             selectedSettings.setFigurePatternMode(corners);
             figureSetSettingsFrame.dispose();
         });
-        JButton cancelButton = createButton("Cancel", e -> figureSetSettingsFrame.dispose());
+        JButton cancelButton = createButton("Cancel", e -> {
+            if (corners == 3){
+                if (!threeCorners.isApply()) {
+                    selectedSettings.setFigureSize(100);
+                    selectedSettings.setFigureRotate(0);
+                }
+            }
+            if (corners == 4){
+                if (!fourCorners.isApply()) {
+                    selectedSettings.setFigureSize(100);
+                    selectedSettings.setFigureRotate(0);
+                }
+            }
+            if (corners == 5){
+                if (!fiveCorners.isApply()) {
+                    selectedSettings.setFigureSize(100);
+                    selectedSettings.setFigureRotate(0);
+                }
+            }
+            if (corners == 6){
+                if (!sixCorners.isApply()) {
+                    selectedSettings.setFigureSize(100);
+                    selectedSettings.setFigureRotate(0);
+                }
+            }
+            else {
+                if (!polygon.isApply()) {
+                    selectedSettings.setFigureSize(100);
+                    selectedSettings.setFigureRotate(0);
+                }
+            }
+            figureSetSettingsFrame.dispose();
+        });
 
         addComponentsToSettingsPanelForPolygon(settingsPanel, sizePanel, rotationPanel, applyButton, okButton, cancelButton);
 
@@ -639,5 +774,85 @@ public class ToolBarMenu extends JToolBar {
         figureSetSettingsFrame.add(mainPanel);
         figureSetSettingsFrame.setVisible(true);
     }
+
+
+
+    public void createChosenWindowForStar(int corners, String formName) {
+        int formSizeH = 380;
+        int formSizeW = 500;
+
+        if (!star.isApply()) {
+            selectedSettings.setStarCorners(5);
+            selectedSettings.setStarSize(100);
+            selectedSettings.setStarRadius(50);
+            selectedSettings.setFigureRotate(0);
+        }
+
+        JFrame figureSetSettingsFrame = createFrame(formName, formSizeW, formSizeH);
+
+        JPanel mainPanel = new JPanel(new BorderLayout());
+
+        ImagePanel figurePanel = createFigurePanel(formSizeW, formSizeH, corners);
+        mainPanel.add(figurePanel, BorderLayout.CENTER);
+
+        JPanel settingsPanel = new JPanel();
+        settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
+
+        JSlider sizeSlider = createSlider(0, 200, 100, 50, 25);
+        if (star.isApply())
+            sizeSlider.setValue(star.getSize());
+        JTextField sizeTextField = createTextField(sizeSlider);
+        JPanel sizePanel = createSliderPanel("Choose size: ", sizeTextField, sizeSlider);
+        configureSliderListener(sizeSlider, sizeTextField, figurePanel, "size");
+
+        JSlider cornersSlider = createSlider(0, 100, 5, 20, 10);
+        if (star.isApply())
+            cornersSlider.setValue(star.getCorners());
+        JTextField cornersTextField = createTextField(cornersSlider);
+        JPanel cornersPanel = createSliderPanel("Choose amount of corners:", cornersTextField, cornersSlider);
+        configureSliderListener(cornersSlider, cornersTextField, figurePanel, "corners");
+
+        JSlider rotationSlider = createSlider(0, 1440, 0, 360, 180);
+        if (star.isApply())
+            rotationSlider.setValue(star.getRotate());
+        JTextField rotationTextField = createTextField(rotationSlider);
+        JPanel rotationPanel = createSliderPanel("Choose rotation:", rotationTextField, rotationSlider);
+        configureSliderListener(rotationSlider, rotationTextField, figurePanel, "rotate");
+
+        JSlider radiusSlider = createSlider(0, 200, 50, 50, 25);
+        if (star.isApply())
+            radiusSlider.setValue(star.getRadius());
+        JTextField radiusTextField = createTextField(radiusSlider);
+        JPanel radiusPanel = createSliderPanel("Choose radius:", radiusTextField, radiusSlider);
+        configureSliderListener(radiusSlider, radiusTextField, figurePanel, "radius");
+
+        JButton applyButton = createButton("Apply", e -> {
+            star.setIsStar(true);
+            star.setApply();
+            star.setCorners(cornersSlider.getValue());
+            star.setSize(sizeSlider.getValue());
+            star.setRadius(radiusSlider.getValue());
+            star.setRotate(rotationSlider.getValue());
+            figurePanel.repaint();
+        });
+        JButton okButton = createButton("Ok", e -> {
+            selectedSettings.setStarMode();
+            figureSetSettingsFrame.dispose();
+        });
+        JButton cancelButton = createButton("Cancel", e -> {
+            selectedSettings.setStarCorners(5);
+            selectedSettings.setStarSize(100);
+            selectedSettings.setStarRadius(50);
+            selectedSettings.setFigureRotate(0);
+            figureSetSettingsFrame.dispose();
+        });
+
+        addComponentsToSettingsPanel(settingsPanel, sizePanel, cornersPanel, rotationPanel, radiusPanel, applyButton, okButton, cancelButton);
+
+        mainPanel.add(settingsPanel, BorderLayout.EAST);
+        figureSetSettingsFrame.add(mainPanel);
+        figureSetSettingsFrame.setVisible(true);
+    }
+
 
 }

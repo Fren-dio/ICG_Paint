@@ -1,3 +1,5 @@
+package Settings;
+
 import java.awt.Color;
 
 public class SelectedSettings {

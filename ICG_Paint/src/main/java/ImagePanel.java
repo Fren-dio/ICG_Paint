@@ -1,6 +1,9 @@
+import Settings.MainWindowSettings;
+import Settings.SavedFigureSettings;
+import Settings.SelectedSettings;
+
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -109,7 +112,6 @@ public class ImagePanel extends JPanel implements MouseListener {
 			}
 		});
 
-		// Добавляем слушатель изменения размера окна
 		addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent e) {
 				handleResize();
@@ -121,7 +123,6 @@ public class ImagePanel extends JPanel implements MouseListener {
 		int newWidth = getWidth();
 		int newHeight = getHeight();
 
-		// Если окно увеличивается, увеличиваем BufferedImage
 		if (newWidth > currentImage.getWidth() || newHeight > currentImage.getHeight()) {
 			BufferedImage newImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g2d = newImage.createGraphics();
