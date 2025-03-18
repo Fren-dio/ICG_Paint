@@ -8,7 +8,7 @@ import java.util.Objects;
 
 public class ToolBarMenu extends JToolBar {
 
-    private final int btnSize = 50;
+    private final int btnSize = 40;
 
     private final ImagePanel imagePanel;
     private final SelectedSettings selectedSettings;
@@ -194,13 +194,13 @@ public class ToolBarMenu extends JToolBar {
         this.add(Box.createGlue());
     }
 
-    int showBoldsDialog() {
+    int showParametrDialog(int lowBarrier, int topBarrier) {
         Integer selected = null;
 
         while (selected == null) {
             String input = JOptionPane.showInputDialog(
                     this,
-                    "Enter the bold of line (1-20):",
+                    "Введите толщину линии (от 1 до 100):",
                     "Bold of line",
                     JOptionPane.QUESTION_MESSAGE
             );
@@ -211,7 +211,46 @@ public class ToolBarMenu extends JToolBar {
             }
             try {
                 selected = Integer.parseInt(input);
-                if (selected < 1 || selected > 20) {
+                if (selected < lowBarrier || selected > topBarrier) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Please enter a number between 1 and 20.",
+                            "Invalid Input",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    selected = null;
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Invalid input. Please enter a valid integer.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
+
+        return (selected != null) ? selected : -1;
+    }
+
+    int showBoldsDialog() {
+        Integer selected = null;
+
+        while (selected == null) {
+            String input = JOptionPane.showInputDialog(
+                    this,
+                    "Введите толщину линии (от 1 до 100):",
+                    "Bold of line",
+                    JOptionPane.QUESTION_MESSAGE
+            );
+
+            // Если пользователь нажал "Отмена" или закрыл окно
+            if (input == null) {
+                break;
+            }
+            try {
+                selected = Integer.parseInt(input);
+                if (selected < 1 || selected > 100) {
                     JOptionPane.showMessageDialog(
                             this,
                             "Please enter a number between 1 and 20.",
@@ -327,128 +366,202 @@ public class ToolBarMenu extends JToolBar {
         patternsGrid.add(polygonBtn);
     }
 
-    private void createChosenWindowForStar(int corners, String formName) {
+    public void createChosenWindowForStar(int corners, String formName) {
         int formSizeH = 380;
         int formSizeW = 500;
-        JFrame figureSetSettingsFrame = new JFrame(formName);
-
-        figureSetSettingsFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        figureSetSettingsFrame.setSize(formSizeW, formSizeH);
-
-        // Установим позицию окна
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        figureSetSettingsFrame.setLocation(
-                (int) ((screenSize.getWidth() - formSizeW) / 2),
-                (int) ((screenSize.getHeight() - formSizeH) / 2)
-        );
+        JFrame figureSetSettingsFrame = createFrame(formName, formSizeW, formSizeH);
 
         JPanel mainPanel = new JPanel(new BorderLayout());
 
-        // Панель для отображения фигуры
-        ImagePanel figurePanel = new ImagePanel(selectedSettings, 100, 0, corners);
-        figurePanel.setPreferredSize(new Dimension(formSizeW - 200, formSizeH));
+        ImagePanel figurePanel = createFigurePanel(formSizeW, formSizeH, corners);
         mainPanel.add(figurePanel, BorderLayout.CENTER);
-        figurePanel.setStarExampleValue(true);
 
-        // Панель настроек
         JPanel settingsPanel = new JPanel();
         settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
 
-        JSlider sizeSlider = new JSlider(JSlider.HORIZONTAL, 5, 200, 100);
-        JLabel labelSize = new JLabel("Choose size: " + sizeSlider.getValue());
-        sizeSlider.setMajorTickSpacing(50);
-        sizeSlider.setMinorTickSpacing(25);
-        sizeSlider.setPaintTicks(true);
-        sizeSlider.setPaintLabels(true);
+        JSlider sizeSlider = createSlider(0, 200, 100, 50, 25);
+        JTextField sizeTextField = createTextField(sizeSlider);
+        JPanel sizePanel = createSliderPanel("Choose size: ", sizeTextField, sizeSlider);
+        configureSliderListener(sizeSlider, sizeTextField, figurePanel, "size");
 
-        JSlider rotationSlider = new JSlider(JSlider.HORIZONTAL, 5, 250, 125);
-        JLabel labelRotation = new JLabel("Choose rotation:" + rotationSlider.getValue());
-        rotationSlider.setMajorTickSpacing(50);
-        rotationSlider.setMinorTickSpacing(25);
-        rotationSlider.setPaintTicks(true);
-        rotationSlider.setPaintLabels(true);
+        JSlider cornersSlider = createSlider(0, 100, 5, 20, 10);
+        JTextField cornersTextField = createTextField(cornersSlider);
+        JPanel cornersPanel = createSliderPanel("Choose amount of corners:", cornersTextField, cornersSlider);
+        configureSliderListener(cornersSlider, cornersTextField, figurePanel, "corners");
 
-        JSlider cornersSlider = new JSlider(JSlider.HORIZONTAL, 3, 50, 5);
-        JLabel cornersSize = new JLabel("Choose amount of corners:" + cornersSlider.getValue());
-        cornersSlider.setMajorTickSpacing(50);
-        cornersSlider.setMinorTickSpacing(25);
-        cornersSlider.setPaintTicks(true);
-        cornersSlider.setPaintLabels(true);
+        JSlider rotationSlider = createSlider(0, 1440, 0, 360, 180);
+        JTextField rotationTextField = createTextField(rotationSlider);
+        JPanel rotationPanel = createSliderPanel("Choose rotation:", rotationTextField, rotationSlider);
+        configureSliderListener(rotationSlider, rotationTextField, figurePanel, "rotate");
 
-        JSlider radiusSlider = new JSlider(JSlider.HORIZONTAL, 0, 220, 0);
-        JLabel radiusRotation = new JLabel("Choose radius:" + radiusSlider.getValue());
-        radiusSlider.setMajorTickSpacing(90);
-        radiusSlider.setMinorTickSpacing(30);
-        radiusSlider.setPaintTicks(true);
-        radiusSlider.setPaintLabels(true);
+        JSlider radiusSlider = createSlider(0, 200, 0, 50, 25);
+        JTextField radiusTextField = createTextField(radiusSlider);
+        JPanel radiusPanel = createSliderPanel("Choose radius:", radiusTextField, radiusSlider);
+        configureSliderListener(radiusSlider, radiusTextField, figurePanel, "radius");
 
-        JButton applyButton = new JButton("Apply");
-        applyButton.addActionListener(e -> {
-            figurePanel.repaint();
-        });
-
-        JButton okButton = new JButton("Ok");
-        okButton.addActionListener(e -> {
+        JButton applyButton = createButton("Apply", e -> figurePanel.repaint());
+        JButton okButton = createButton("Ok", e -> {
             selectedSettings.setStarMode();
             figureSetSettingsFrame.dispose();
         });
+        JButton cancelButton = createButton("Cancel", e -> figureSetSettingsFrame.dispose());
 
-        JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(e -> {
-            figureSetSettingsFrame.dispose();
-        });
-
-        settingsPanel.add(labelSize);
-        settingsPanel.add(sizeSlider);
-        settingsPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        settingsPanel.add(labelRotation);
-        settingsPanel.add(rotationSlider);
-        settingsPanel.add(cornersSize);
-        settingsPanel.add(cornersSlider);
-        settingsPanel.add(radiusRotation);
-        settingsPanel.add(radiusSlider);
-        settingsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        settingsPanel.add(applyButton);
-        settingsPanel.add(okButton);
-        settingsPanel.add(cancelButton);
-
-        sizeSlider.addChangeListener(e -> {
-            labelSize.setText("Choose size: " + sizeSlider.getValue());
-            figurePanel.setStarParamsSize(sizeSlider.getValue());
-            figurePanel.repaint();
-        });
-
-        rotationSlider.addChangeListener(e -> {
-            labelRotation.setText("Choose rotation:" + rotationSlider.getValue());
-            figurePanel.setStarParamsRotate(rotationSlider.getValue());
-            figurePanel.repaint();
-        });
-
-        cornersSlider.addChangeListener(e -> {
-            cornersSize.setText("Choose amount of corners:" + cornersSlider.getValue());
-            figurePanel.setStarParamsCorners(cornersSlider.getValue());
-            figurePanel.repaint();
-        });
-
-        radiusSlider.addChangeListener(e -> {
-            radiusRotation.setText("Choose radius:" + radiusSlider.getValue());
-            figurePanel.setStarParamsRadius(radiusSlider.getValue());
-            figurePanel.repaint();
-        });
-
+        addComponentsToSettingsPanel(settingsPanel, sizePanel, cornersPanel, rotationPanel, radiusPanel, applyButton, okButton, cancelButton);
 
         mainPanel.add(settingsPanel, BorderLayout.EAST);
         figureSetSettingsFrame.add(mainPanel);
         figureSetSettingsFrame.setVisible(true);
+    }
 
+    private JFrame createFrame(String title, int width, int height) {
+        JFrame frame = new JFrame(title);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(width, height);
 
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setLocation(
+                (int) ((screenSize.getWidth() - width) / 2),
+                (int) ((screenSize.getHeight() - height) / 2)
+        );
+        return frame;
+    }
+
+    private ImagePanel createFigurePanel(int width, int height, int corners) {
+        ImagePanel panel = new ImagePanel(selectedSettings, 100, 0, corners);
+        panel.setPreferredSize(new Dimension(width - 200, height));
+        panel.setStarExampleValue(true);
+        return panel;
+    }
+
+    private ImagePanel createFigurePanelForPolygon(int width, int height, int corners) {
+        ImagePanel panel = new ImagePanel(selectedSettings, 100, 0, corners);
+        panel.setPreferredSize(new Dimension(width - 200, height));
+        panel.setPolygonExampleValue(true);
+        return panel;
+    }
+
+    private JSlider createSlider(int min, int max, int value, int majorTick, int minorTick) {
+        JSlider slider = new JSlider(JSlider.HORIZONTAL, min, max, value);
+        slider.setMajorTickSpacing(majorTick);
+        slider.setMinorTickSpacing(minorTick);
+        slider.setPaintTicks(true);
+        slider.setPaintLabels(true);
+        return slider;
+    }
+
+    private JTextField createTextField(JSlider slider) {
+        JTextField textField = new JTextField(3);
+        textField.setMaximumSize(new Dimension(50, 20));
+        textField.setText(String.valueOf(slider.getValue()));
+        return textField;
+    }
+
+    private JPanel createSliderPanel(String labelText, JTextField textField, JSlider slider) {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        panel.add(textField);
+        panel.add(slider);
+        return panel;
+    }
+
+    private void configureSliderListener(JSlider slider, JTextField textField, ImagePanel panel, String paramType) {
+        slider.addChangeListener(e -> {
+            int value = slider.getValue();
+            textField.setText(String.valueOf(value));
+            switch (paramType) {
+                case "size" -> panel.setStarParamsSize(value);
+                case "corners" -> panel.setStarParamsCorners(value);
+                case "rotate" -> panel.setStarParamsRotate(value);
+                case "radius" -> panel.setStarParamsRadius(value);
+            }
+            panel.repaint();
+        });
+
+        textField.addActionListener(e -> {
+            try {
+                int value = Integer.parseInt(textField.getText());
+                if (value >= slider.getMinimum() && value <= slider.getMaximum()) {
+                    slider.setValue(value);
+                } else {
+                    showErrorDialog("Value must be between " + slider.getMinimum() + " and " + slider.getMaximum());
+                }
+            } catch (NumberFormatException ex) {
+                showErrorDialog("Please enter a valid integer.");
+            }
+        });
+    }
+
+    private void configureSliderListenerForPolygon(JSlider slider, JTextField textField, ImagePanel panel, String paramType) {
+        slider.addChangeListener(e -> {
+            int value = slider.getValue();
+            textField.setText(String.valueOf(value));
+            switch (paramType) {
+                case "size" -> panel.setPolygonSize(value);
+                case "rotate" -> panel.setPolygonRotate(value);
+            }
+            panel.repaint();
+        });
+
+        textField.addActionListener(e -> {
+            try {
+                int value = Integer.parseInt(textField.getText());
+                if (value >= slider.getMinimum() && value <= slider.getMaximum()) {
+                    slider.setValue(value);
+                } else {
+                    showErrorDialog("Value must be between " + slider.getMinimum() + " and " + slider.getMaximum());
+                }
+            } catch (NumberFormatException ex) {
+                showErrorDialog("Please enter a valid integer.");
+            }
+        });
+    }
+
+    private JButton createButton(String text, ActionListener listener) {
+        JButton button = new JButton(text);
+        button.addActionListener(listener);
+        return button;
+    }
+
+    private void addComponentsToSettingsPanel(JPanel settingsPanel, JPanel sizePanel, JPanel cornersPanel, JPanel rotationPanel, JPanel radiusPanel, JButton applyButton, JButton okButton, JButton cancelButton) {
+        settingsPanel.add(new JLabel("Choose size: "));
+        settingsPanel.add(sizePanel);
+        settingsPanel.add(new JLabel("Choose amount of corners:"));
+        settingsPanel.add(cornersPanel);
+        settingsPanel.add(new JLabel("Choose rotation:"));
+        settingsPanel.add(rotationPanel);
+        settingsPanel.add(new JLabel("Choose radius:"));
+        settingsPanel.add(radiusPanel);
+
+        settingsPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        settingsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        btnPanel.add(applyButton);
+        btnPanel.add(okButton);
+        btnPanel.add(cancelButton);
+        settingsPanel.add(btnPanel);
+    }
+
+    private void addComponentsToSettingsPanelForPolygon(JPanel settingsPanel, JPanel sizePanel, JPanel rotationPanel, JButton applyButton, JButton okButton, JButton cancelButton) {
+        settingsPanel.add(new JLabel("Choose size: "));
+        settingsPanel.add(sizePanel);
+        settingsPanel.add(new JLabel("Choose rotation:"));
+        settingsPanel.add(rotationPanel);
+
+        settingsPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        settingsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        btnPanel.add(applyButton);
+        btnPanel.add(okButton);
+        btnPanel.add(cancelButton);
+        settingsPanel.add(btnPanel);
+    }
+
+    private void showErrorDialog(String message) {
+        JOptionPane.showMessageDialog(null, message, "Invalid Input", JOptionPane.ERROR_MESSAGE);
     }
 
     int showPolygonCornersDialog() {
-        // Создаем массив возможных значений углов
         Integer[] cornersOptions = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
 
-        // Создаем диалог выбора
         Integer selectedCorners = (Integer) JOptionPane.showInputDialog(
                 this,
                 "Choose the number of corners:",
@@ -467,7 +580,6 @@ public class ToolBarMenu extends JToolBar {
         setDimensionBtn(button, new Dimension(btnSize / 2, btnSize / 2));
         button.setBackground(color);
 
-        // Устанавливаем обработчик для изменения цвета
         button.addActionListener(e -> selectedSettings.setCurrentColor(color));
         return button;
     }
@@ -487,108 +599,45 @@ public class ToolBarMenu extends JToolBar {
         return btn;
     }
 
-    void createChosenWindow(int corners, String formName) {
-        int formSizeH = 300;
+    public void createChosenWindow(int corners, String formName) {
+        int formSizeH = 380;
         int formSizeW = 500;
-        JFrame figureSetSettingsFrame = new JFrame(formName);
-
-        figureSetSettingsFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        figureSetSettingsFrame.setSize(formSizeW, formSizeH);
-
-        // Установим позицию окна
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        figureSetSettingsFrame.setLocation(
-                (int) ((screenSize.getWidth() - formSizeW) / 2),
-                (int) ((screenSize.getHeight() - formSizeH) / 2)
-        );
+        JFrame figureSetSettingsFrame = createFrame(formName, formSizeW, formSizeH);
 
         JPanel mainPanel = new JPanel(new BorderLayout());
 
-        // Панель для отображения фигуры
-        ImagePanel figurePanel = new ImagePanel(selectedSettings, 100, 0, corners);
-        figurePanel.setPreferredSize(new Dimension(formSizeW - 200, formSizeH));
-        mainPanel.add(figurePanel, BorderLayout.CENTER);
+        ImagePanel figurePanel = createFigurePanelForPolygon(formSizeW, formSizeH, corners);
         figurePanel.setPolygonExampleValue(true);
+        figurePanel.setFigureParameters(100, 0, corners);
+        figurePanel.drawExample();
+        figurePanel.repaint();
+        mainPanel.add(figurePanel, BorderLayout.CENTER);
 
-        // Панель настроек
         JPanel settingsPanel = new JPanel();
         settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
 
-        JLabel labelSize = new JLabel("Choose size:");
-        JSlider sizeSlider = new JSlider(JSlider.HORIZONTAL, 5, 250, 125);
-        sizeSlider.setMajorTickSpacing(50);
-        sizeSlider.setMinorTickSpacing(25);
-        sizeSlider.setPaintTicks(true);
-        sizeSlider.setPaintLabels(true);
+        JSlider sizeSlider = createSlider(0, 200, 100, 50, 25);
+        JTextField sizeTextField = createTextField(sizeSlider);
+        JPanel sizePanel = createSliderPanel("Choose size: ", sizeTextField, sizeSlider);
+        configureSliderListenerForPolygon(sizeSlider, sizeTextField, figurePanel, "size");
 
-        JLabel labelRotation = new JLabel("Choose rotation angle:");
-        JSlider rotationSlider = new JSlider(JSlider.HORIZONTAL, 0, 720, 0);
-        rotationSlider.setMajorTickSpacing(90);
-        rotationSlider.setMinorTickSpacing(30);
-        rotationSlider.setPaintTicks(true);
-        rotationSlider.setPaintLabels(true);
+        JSlider rotationSlider = createSlider(0, 1440, 0, 360, 180);
+        JTextField rotationTextField = createTextField(rotationSlider);
+        JPanel rotationPanel = createSliderPanel("Choose rotation:", rotationTextField, rotationSlider);
+        configureSliderListenerForPolygon(rotationSlider, rotationTextField, figurePanel, "rotate");
 
-        JButton applyButton = new JButton("Apply");
-        applyButton.addActionListener(e -> {
-            figurePanel.setFigureParameters(sizeSlider.getValue(), rotationSlider.getValue(), corners);
-            selectedSettings.setFigureSettings(sizeSlider.getValue(), rotationSlider.getValue());
+        JButton applyButton = createButton("Apply", e -> figurePanel.repaint());
+        JButton okButton = createButton("Ok", e -> {
             selectedSettings.setFigurePatternMode(corners);
-            selectedSettings.setFigureMode();
-            JOptionPane.showMessageDialog(figureSetSettingsFrame, "Settings applied!");
-        });
-
-        JButton okButton = new JButton("Ok");
-        okButton.addActionListener(e -> {
-            figurePanel.setFigureParameters(sizeSlider.getValue(), rotationSlider.getValue(), corners);
-            selectedSettings.setFigureSettings(sizeSlider.getValue(), rotationSlider.getValue());
-            selectedSettings.setFigurePatternMode(corners);
-            selectedSettings.setFigureMode();
             figureSetSettingsFrame.dispose();
         });
+        JButton cancelButton = createButton("Cancel", e -> figureSetSettingsFrame.dispose());
 
-        JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(e -> {
-            figureSetSettingsFrame.dispose();
-        });
-
-        settingsPanel.add(labelSize);
-        settingsPanel.add(sizeSlider);
-        settingsPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        settingsPanel.add(labelRotation);
-        settingsPanel.add(rotationSlider);
-        settingsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        settingsPanel.add(applyButton);
-        settingsPanel.add(okButton);
-        settingsPanel.add(cancelButton);
+        addComponentsToSettingsPanelForPolygon(settingsPanel, sizePanel, rotationPanel, applyButton, okButton, cancelButton);
 
         mainPanel.add(settingsPanel, BorderLayout.EAST);
         figureSetSettingsFrame.add(mainPanel);
-
-
-        sizeSlider.addChangeListener(e -> {
-            labelSize.setText("Choose size: " + sizeSlider.getValue());
-            figurePanel.setPolygonSize(sizeSlider.getValue());
-            selectedSettings.setFigureSize(sizeSlider.getValue());
-            selectedSettings.setFigureMode();
-            figurePanel.repaint();
-        });
-
-
-        rotationSlider.addChangeListener(e -> {
-            labelRotation.setText("Choose rotation: " + rotationSlider.getValue());
-            figurePanel.setPolygonRotate(rotationSlider.getValue());
-            selectedSettings.setFigureRotate(rotationSlider.getValue());
-            selectedSettings.setFigurePatternMode(corners);
-            figurePanel.repaint();
-        });
-
         figureSetSettingsFrame.setVisible(true);
-        figureSetSettingsFrame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                figureSetSettingsFrame.dispose();
-            }
-        });
     }
 
 }

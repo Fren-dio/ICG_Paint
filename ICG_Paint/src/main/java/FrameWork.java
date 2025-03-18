@@ -19,27 +19,43 @@ public class FrameWork extends JFrame
 	FrameWork()
 	{
 		super("ICG test");
+
 		//set window's size
 		int minWindowWidth = 640;
 		int minWindowHeight = 480;
 		int windowWidth = 640+300;
 		int windowHeight = 480+200;
-		setPreferredSize(new Dimension(windowWidth, windowHeight));
-		setMinimumSize(new Dimension(minWindowWidth, minWindowHeight));
-		setResizable(true);
+
+		this.setPreferredSize(new Dimension(windowWidth, windowHeight));
+		this.setSize(new Dimension(windowWidth, windowHeight));
+		this.setMinimumSize(new Dimension(minWindowWidth, minWindowHeight));
+		this.setResizable(true);
+
 		//set window's position
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		setLocation((int)((screenSize.getWidth()- windowWidth)/2), (int)((screenSize.getHeight()- windowHeight)/2));
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		MainWindowSettings mainWindowSettings = new MainWindowSettings();
+
+		mainWindowSettings.setSize(new Dimension(windowWidth, windowHeight-115));
+
+		this.setLocation((int)((screenSize.getWidth()- windowWidth)/2), (int)((screenSize.getHeight()- windowHeight)/2));
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		//set image panel
-		SelectedSettings defaultColor = new SelectedSettings(Color.lightGray);
+		SelectedSettings defaultColor = new SelectedSettings(Color.black);
 		this.selectedSettings = defaultColor;
-		ImagePanel p = new ImagePanel(defaultColor);
+		ImagePanel p = new ImagePanel(defaultColor, mainWindowSettings);
 		this.imagePanel = p;
 		add(p);
 
-		//set inform menu
+		// Обертывание ImagePanel в JScrollPane
+		JScrollPane scrollPane = new JScrollPane(imagePanel);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+		// Добавление JScrollPane в окно
+		add(scrollPane, BorderLayout.CENTER);
+
+		//set inform menuJScrollPane
 		addMainMenu();
 
 		// set tool bar menu
@@ -185,11 +201,14 @@ public class FrameWork extends JFrame
 				selectedSettings.setFigurePatternMode(corners);
 			}
 		});
+		patternsMenu.addMenuItem("Star", () -> {
+			ToolBarMenu toolBarMenu = new ToolBarMenu(this.imagePanel, this.selectedSettings);
+			toolBarMenu.createChosenWindowForStar(5, "Star's Settings");
+		});
 
 		MainMenuPanel clearMenu = new MainMenuPanel("Clean");
 		clearMenu.addMenuItem("Clean", () -> imagePanel.clear());
 
-		// Добавляем пункты меню в меню бар
 		menuBar.add(aboutMenu);
 		menuBar.add(fileMenu);
 		menuBar.add(toolsMenu);
@@ -198,7 +217,6 @@ public class FrameWork extends JFrame
 		menuBar.add(patternsMenu);
 		menuBar.add(clearMenu);
 
-		// Устанавливаем меню бар в окно
 		setJMenuBar(menuBar);
 	}
 

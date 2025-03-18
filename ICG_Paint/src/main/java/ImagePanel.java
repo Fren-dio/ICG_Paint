@@ -1,7 +1,5 @@
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
@@ -14,16 +12,13 @@ import javax.swing.*;
 public class ImagePanel extends JPanel implements MouseListener {
 
 	private JScrollPane scrollPane;
+	private MainWindowSettings mainWindowSettings;
 	private boolean draw = true;
 	private int x, y, xd = -1, yd = -1;
 	private BufferedImage currentImage;
 
 	int DEFAULT_TRIANGLE_SIZE = 200;
-	int DEFAULT_SQUARE_SIZE = 200;
 	private SelectedSettings selectedSettings;
-	private int FIGURE_SIZE;
-	private int FIGURE_ROTATE;
-	private int FIGURE_COUNT_CORNER;
 	private BufferedImage exampleImage;
 
 	public Boolean starExampleMode;
@@ -48,9 +43,6 @@ public class ImagePanel extends JPanel implements MouseListener {
 		polygonExampleMode = false;
 		exampleMode = false;
 		this.selectedSettings = selectedSettings;
-		this.FIGURE_SIZE = figureSize;
-		this.FIGURE_ROTATE = figureRotate;
-		this.FIGURE_COUNT_CORNER = figureCorners;
 		currentImage = new BufferedImage(1000, 700, BufferedImage.TYPE_INT_ARGB);
 	}
 
@@ -64,14 +56,34 @@ public class ImagePanel extends JPanel implements MouseListener {
 		}
 	}
 
-	public ImagePanel(SelectedSettings selectedSettings) {
-		this();
+	@Override
+	public Dimension getPreferredSize() {
+		if (currentImage != null) {
+			return new Dimension(currentImage.getWidth(), currentImage.getHeight());
+		}
+		return super.getPreferredSize();
+	}
+
+	public ImagePanel(SelectedSettings selectedSettings, MainWindowSettings mainWindowSettings) {
+
+		this.mainWindowSettings = mainWindowSettings;
 		imageLabel = new JLabel();
 		scrollPane = new JScrollPane(imageLabel);
 		starExampleMode = false;
 		polygonExampleMode = false;
 		exampleMode = false;
 		this.selectedSettings = selectedSettings;
+
+		starExampleMode = false;
+		exampleMode = false;
+		currentImage = new BufferedImage(mainWindowSettings.getWeight(), mainWindowSettings.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		exampleImage = new BufferedImage(mainWindowSettings.getWeight(), mainWindowSettings.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		imageLabel = new JLabel();
+		JScrollPane scrollPane = new JScrollPane(this);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		clearExampleImage();
+
 		addMouseListener(this);
 
 		addMouseMotionListener(new MouseAdapter() {
@@ -96,6 +108,47 @@ public class ImagePanel extends JPanel implements MouseListener {
 				}
 			}
 		});
+
+		// Добавляем слушатель изменения размера окна
+		addComponentListener(new ComponentAdapter() {
+			public void componentResized(ComponentEvent e) {
+				handleResize();
+			}
+		});
+	}
+
+	private void handleResize() {
+		int newWidth = getWidth();
+		int newHeight = getHeight();
+
+		// Если окно увеличивается, увеличиваем BufferedImage
+		if (newWidth > currentImage.getWidth() || newHeight > currentImage.getHeight()) {
+			BufferedImage newImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g2d = newImage.createGraphics();
+			g2d.drawImage(currentImage, 0, 0, null);
+			g2d.dispose();
+			currentImage = newImage;
+			setPreferredSize(new Dimension(newWidth, newHeight));
+			revalidate();
+		}
+
+		// Проверяем, нужно ли показывать скроллбары
+		checkScrollBars();
+	}
+
+	private void checkScrollBars() {
+		if (currentImage == null) return;
+
+		int imageWidth = currentImage.getWidth();
+		int imageHeight = currentImage.getHeight();
+		int panelWidth = getWidth();
+		int panelHeight = getHeight();
+
+		boolean needHorizontalScroll = (imageWidth > panelWidth);
+		boolean needVerticalScroll = (imageHeight > panelHeight);
+
+		scrollPane.setHorizontalScrollBarPolicy(needHorizontalScroll ? JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED : JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setVerticalScrollBarPolicy(needVerticalScroll ? JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED : JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 	}
 
 	private void bresenhemDrawLine(int x0, int y0, int x1, int y1) {
@@ -135,9 +188,6 @@ public class ImagePanel extends JPanel implements MouseListener {
 	}
 
 	public void setFigureParameters(int figureSize, int figureRotate, int figureCorners) {
-		this.FIGURE_SIZE = figureSize;
-		this.FIGURE_ROTATE = figureRotate;
-		this.FIGURE_COUNT_CORNER = figureCorners;
 		drawExampleFigure();
 	}
 
@@ -248,7 +298,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 		}
 
 		for (int i = 0; i < corners; i++) {
-			int nextIndex = (i + 1) % corners; // Следующая вершина (с замыканием на первую)
+			int nextIndex = (i + 1) % corners;
 			myDrawLine(g2d, xPointsRotated[i], yPointsRotated[i],
 					xPointsRotated[nextIndex], yPointsRotated[nextIndex], selectedSettings.getCurrentWeight());
 		}
@@ -256,17 +306,15 @@ public class ImagePanel extends JPanel implements MouseListener {
 		repaint();
 	}
 
-	public static void drawStar(Graphics2D g2d, int centerX, int centerY, int outerRadius, int innerRadius, int n, int rotationAngle) {
+	public static void drawStar(Graphics2D g2d, int centerX, int centerY, int outerRadius, int innerRadius, int n, int rotationAngleDegrees) {
 		Path2D.Double star = new Path2D.Double();
-
+		double rotationAngle = Math.toRadians(rotationAngleDegrees);
 		double angleStep = Math.PI / n;
-
 		double angle = -Math.PI / 2 + rotationAngle;
 		double x = centerX + outerRadius * Math.cos(angle);
 		double y = centerY + outerRadius * Math.sin(angle);
 		star.moveTo(x, y);
 
-		// Добавляем остальные вершины
 		for (int i = 1; i <= 2 * n; i++) {
 			angle += angleStep;
 			double radius = (i % 2 == 0) ? outerRadius : innerRadius;
@@ -275,10 +323,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 			star.lineTo(x, y);
 		}
 
-		// Замыкаем путь
 		star.closePath();
-
-		// Рисуем звезду
 		g2d.draw(star);
 	}
 
@@ -290,20 +335,19 @@ public class ImagePanel extends JPanel implements MouseListener {
 	}
 
 
-	private void drawStarGraphic(int centerX, int centerY, int outerRadius, int innerRadius, int n, int rotationAngle) {
+	private void drawStarGraphic(int centerX, int centerY, int outerRadius, int innerRadius, int n, int rotationAngleDegrees) {
 		Graphics2D g2d = this.currentImage.createGraphics();
 		g2d.setColor(selectedSettings.getCurrentColor());
 		g2d.setStroke(new BasicStroke(selectedSettings.getCurrentWeight()));
 		Path2D.Double star = new Path2D.Double();
 
+		double rotationAngle = Math.toRadians(rotationAngleDegrees);
 		double angleStep = Math.PI / n;
-
 		double angle = -Math.PI / 2 + rotationAngle;
 		double x = centerX + outerRadius * Math.cos(angle);
 		double y = centerY + outerRadius * Math.sin(angle);
 		star.moveTo(x, y);
 
-		// Добавляем остальные вершины
 		for (int i = 1; i <= 2 * n; i++) {
 			angle += angleStep;
 			double radius = (i % 2 == 0) ? outerRadius : innerRadius;
@@ -312,10 +356,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 			star.lineTo(x, y);
 		}
 
-		// Замыкаем путь
 		star.closePath();
-
-		// Рисуем звезду
 		g2d.draw(star);
 		repaint();
 	}
@@ -341,7 +382,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 
 	@Override
 	public void mouseReleased(MouseEvent ev) {
-		if (currentImage == null) return; // Проверка на null
+		if (currentImage == null) return;
 
 		if (selectedSettings.getCurrentMode().equals("STRAIGHT_LINE_MODE")) {
 			System.out.println(selectedSettings.getCurrentWeight());
@@ -565,7 +606,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 
 		Graphics2D g2d = currentImage.createGraphics();
 		for (int i = 0; i < corners; i++) {
-			int nextIndex = (i + 1) % corners; // Следующая вершина (с замыканием на первую)
+			int nextIndex = (i + 1) % corners;
 			myDrawLine(g2d, xPointsRotated[i], yPointsRotated[i],
 					xPointsRotated[nextIndex], yPointsRotated[nextIndex], selectedSettings.getCurrentWeight());
 		}
