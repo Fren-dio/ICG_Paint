@@ -9,19 +9,185 @@ import java.util.Objects;
 
 public class ToolBarMenu extends JToolBar {
 
+    private FrameWork frameWork;
     private SavedFigureSettings star;
     private SavedFigureSettings threeCorners;
     private SavedFigureSettings fourCorners;
     private SavedFigureSettings fiveCorners;
     private SavedFigureSettings sixCorners;
     private SavedFigureSettings polygon;
+
+    public boolean lineBtnFlag;
+    public boolean wavedBtnFlag;
+    public boolean fillBtnFlag;
+    public boolean funBtnFlag;
+    public boolean cleanBtnFlag;
+    public boolean lightWeightFlag;
+    public boolean mediumWeightFlag;
+    public boolean hardWeightFlag;
+    public boolean otherWeightFlag;
     private final int btnSize = 40;
 
     private final ImagePanel imagePanel;
     private final SelectedSettings selectedSettings;
 
-    public ToolBarMenu(ImagePanel imagePanel, SelectedSettings selectedSettings) {
+
+    JButton lineBtn;
+    JButton wavedLineBtn;
+    JButton fillBtn;
+    JButton clearBtn;
+    JButton funBtn;
+    JButton lightWeightLineBtn;
+    JButton mediumWeightLineBtn;
+    JButton boldWeightLineBtn;
+    JButton otherWeightLineBtn;
+    JButton currentColorBtn;
+
+    public void setCurrenColor(Color color) {
+        currentColorBtn.setBackground(color);
+    }
+
+    public void pressFillBtn() {
+        selectedSettings.setFillMode();
+        setAllModesFlagFalse();
+        fillBtnFlag = true;
+        if (fillBtnFlag) {
+            fillBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("pressed/filling_icon.jpg"))));
+            frameWork.setFillModeMenuItemSelected(true);
+        }
+        else
+            fillBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("filling_icon.jpg"))));
+    }
+    public void pressFunBtn() {
+        selectedSettings.setFunPatternMode();
+        setAllModesFlagFalse();
+        funBtnFlag = true;
+        if (funBtnFlag) {
+            funBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("pressed/fun_icon.jpg"))));
+            frameWork.setFunModeMenuItemSelected(true);
+        }
+        else
+            funBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("fun_icon.jpg"))));
+    }
+    public void pressLineBtn() {
+        selectedSettings.setStraightLineMode();
+        setAllModesFlagFalse();
+        lineBtnFlag = true;
+        if (lineBtnFlag) {
+            lineBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("pressed/line_icon.jpg"))));
+            frameWork.setStraightLineMenuItemSelected(true);
+        }
+        else
+            lineBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("line_icon.jpg"))));
+    }
+    public void pressWavedBtn() {
+        selectedSettings.setWavedLineMode();
+        setAllModesFlagFalse();
+        wavedBtnFlag = true;
+        if (wavedBtnFlag) {
+            wavedLineBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("pressed/waved_line_icon.jpg"))));
+            frameWork.setWavedLineMenuItemSelected(true);
+        }
+        else
+            wavedLineBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("waved_line_icon.jpg"))));
+    }
+    public void pressCleanBtn() {
+        imagePanel.clear();
+        setAllModesFlagFalse();
+        cleanBtnFlag = true;
+        if (cleanBtnFlag) {
+            clearBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("pressed/clear_icon.jpg"))));
+        }
+        else
+            clearBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("clear_icon.jpg"))));
+
+        clearBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("clear_icon.jpg"))));
+    }
+
+    public void setAllModesFlagFalse(){
+        //setAllFigureFlagsFalse();
+        lineBtnFlag = false;
+        lineBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("line_icon.jpg"))));
+        wavedBtnFlag = false;
+        wavedLineBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("waved_line_icon.jpg"))));
+        fillBtnFlag = false;
+        fillBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("filling_icon.jpg"))));
+        funBtnFlag = false;
+        funBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("fun_icon.jpg"))));
+        cleanBtnFlag = false;
+        clearBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("clear_icon.jpg"))));
+    }
+
+
+    public void presslightBoldBtn() {
+        setAllBoldsFlagFalse();
+        lightWeightFlag = true;
+        selectedSettings.setWeight(1);
+        if (lightWeightFlag) {
+            frameWork.setLightBoldMenuItemSelected(true);
+            lightWeightLineBtn.setBackground(new Color(200, 200, 200));
+            lightWeightLineBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("pressed/line_weight_light.jpg"))));
+        }
+        else
+            lightWeightLineBtn.setBackground(new Color(255, 255, 255));
+            lightWeightLineBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("line_weight_light.jpg"))));
+    }
+    public void pressMediumBoldBtn() {
+        setAllBoldsFlagFalse();
+        mediumWeightFlag = true;
+        selectedSettings.setWeight(3);
+        if (mediumWeightFlag) {
+            frameWork.setMediumBoldMenuItemSelected(true);
+            mediumWeightLineBtn.setBackground(new Color(200, 200, 200));
+            mediumWeightLineBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("pressed/line_weight_medium.jpg"))));
+        }
+        else {
+            mediumWeightLineBtn.setBackground(new Color(255, 255, 255));
+            mediumWeightLineBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("line_weight_medium.jpg"))));
+        }
+    }
+    public void pressHardBoldBtn() {
+        hardWeightFlag = true;
+        selectedSettings.setWeight(6);
+        if (hardWeightFlag) {
+            frameWork.setHardBoldMenuItemSelected(true);
+            boldWeightLineBtn.setBackground(new Color(200, 200, 200));
+            boldWeightLineBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("pressed/line_weight_bold.jpg"))));
+        }
+        else {
+            boldWeightLineBtn.setBackground(new Color(255, 255, 255));
+            boldWeightLineBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("line_weight_bold.jpg"))));
+        }
+    }
+    public void pressOtherBoldBtn() {
+        setAllBoldsFlagFalse();
+        otherWeightFlag = true;
+        if (otherWeightFlag) {
+            frameWork.setOtherBoldMenuItemSelected(true);
+            otherWeightLineBtn.setBackground(new Color(200, 200, 200));
+        }
+        else{
+            otherWeightLineBtn.setBackground(new Color(255, 255, 255));
+        }
+    }
+
+    public void setAllBoldsFlagFalse(){
+        lightWeightFlag = false;
+        lightWeightLineBtn.setBackground(new Color(255, 255, 255));
+        lightWeightLineBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("line_weight_light.jpg"))));
+        mediumWeightFlag = false;
+        mediumWeightLineBtn.setBackground(new Color(255, 255, 255));
+        mediumWeightLineBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("line_weight_medium.jpg"))));
+        hardWeightFlag = false;
+        boldWeightLineBtn.setBackground(new Color(255, 255, 255));
+        boldWeightLineBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("line_weight_bold.jpg"))));
+        otherWeightFlag = false;
+        otherWeightLineBtn.setBackground(new Color(255,255,255));
+    }
+
+    public ToolBarMenu(ImagePanel imagePanel, SelectedSettings selectedSettings, FrameWork frameWork) {
         this.imagePanel = imagePanel;
+        this.frameWork = frameWork;
         this.selectedSettings = selectedSettings;
         this.star = new SavedFigureSettings();
         this.threeCorners = new SavedFigureSettings();
@@ -31,44 +197,52 @@ public class ToolBarMenu extends JToolBar {
         this.polygon = new SavedFigureSettings();
 
         setDefaultSettings();
+        lineBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("pressed/line_icon.jpg"))));
+        wavedLineBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("waved_line_icon.jpg"))));
+        fillBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("filling_icon.jpg"))));
+        clearBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("clear_icon.jpg"))));
+        funBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("fun_icon.jpg"))));
 
         // Кнопка для прямой линии
-        JButton lineBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("line_icon.jpg"))));
-        if (lineBtn.isSelected())
-            lineBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("waved_line_icon.jpg"))));
         setSizeSquareBtn(lineBtn, btnSize);
         lineBtn.setToolTipText("Draw straight line.");
-        lineBtn.addActionListener(e -> selectedSettings.setStraightLineMode());
+        lineBtn.addActionListener(e -> {
+            pressLineBtn();
+        });
         this.add(lineBtn);
 
         // Кнопка для кривой/волнистой линии
-        JButton wavedLineBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("waved_line_icon.jpg"))));
         setSizeSquareBtn(wavedLineBtn, btnSize);
         wavedLineBtn.setToolTipText("Draw waved line, with any rotate and length.");
-        wavedLineBtn.addActionListener(e -> selectedSettings.setWavedLineMode());
+        wavedLineBtn.addActionListener(e -> {
+            pressWavedBtn();
+        });
         this.add(wavedLineBtn);
 
         this.addSeparator();
 
         // Кнопка для заливки
-        JButton fillBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("filling_icon.jpg"))));
         setSizeSquareBtn(fillBtn, btnSize);
         fillBtn.setToolTipText("Filling area by chosen color");
-        fillBtn.addActionListener(ev -> selectedSettings.setFillMode());
+        fillBtn.addActionListener(ev -> {
+            pressFillBtn();
+        });
         this.add(fillBtn);
 
         // Кнопка для очистки
-        JButton clearBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("clear_icon.jpg"))));
         setSizeSquareBtn(clearBtn, btnSize);
         clearBtn.setToolTipText("Clear all area.");
-        clearBtn.addActionListener(ev -> imagePanel.clear());
+        clearBtn.addActionListener(ev -> {
+            pressCleanBtn();
+        });
         this.add(clearBtn);
 
 
-        JButton funBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("fun_icon.jpg"))));
         setSizeSquareBtn(funBtn, btnSize);
         funBtn.setToolTipText("Just press left mouse button and move your mouse.");
-        funBtn.addActionListener(ev -> selectedSettings.setFunPatternMode());
+        funBtn.addActionListener(ev -> {
+            pressFunBtn();
+        });
         this.add(funBtn);
 
 
@@ -82,32 +256,33 @@ public class ToolBarMenu extends JToolBar {
 
         this.addSeparator();
 
+
+        lightWeightLineBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("pressed/line_weight_light.jpg"))));
+        mediumWeightLineBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("line_weight_medium.jpg"))));
+        boldWeightLineBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("line_weight_bold.jpg"))));
+        otherWeightLineBtn = new JButton("?");
         // panel with weight of line settings
         JPanel weightsGrid = new JPanel();
         weightsGrid.setLayout(new BoxLayout(weightsGrid, BoxLayout.Y_AXIS));
-        JButton lightWeightLineBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("line_weight_light.jpg"))));
         lightWeightLineBtn.setBackground(new Color(255, 255, 255));
         lightWeightLineBtn.setToolTipText("Line weight = 1. 'Light' weight.");
         Dimension weightBtnSize = new Dimension(btnSize*2, btnSize/3);
         setDimensionBtn(lightWeightLineBtn, weightBtnSize);
-        lightWeightLineBtn.addActionListener(e -> selectedSettings.setLightWeight());
+        lightWeightLineBtn.addActionListener(e -> presslightBoldBtn());
         weightsGrid.add(lightWeightLineBtn);
 
-        JButton mediumWeightLineBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("line_weight_medium.jpg"))));
         mediumWeightLineBtn.setBackground(new Color(255, 255, 255));
         mediumWeightLineBtn.setToolTipText("Line weight = 3. 'Medium' weight.");
         setDimensionBtn(mediumWeightLineBtn, weightBtnSize);
-        mediumWeightLineBtn.addActionListener(e -> selectedSettings.setMediumWeight());
+        mediumWeightLineBtn.addActionListener(e -> pressMediumBoldBtn());
         weightsGrid.add(mediumWeightLineBtn);
 
-        JButton boldWeightLineBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("line_weight_bold.jpg"))));
         boldWeightLineBtn.setBackground(new Color(255, 255, 255));
         boldWeightLineBtn.setToolTipText("Line weight = 6. 'Bold' weight.");
         setDimensionBtn(boldWeightLineBtn, weightBtnSize);
-        boldWeightLineBtn.addActionListener(e -> selectedSettings.setBoldWeight());
+        boldWeightLineBtn.addActionListener(e -> pressHardBoldBtn());
         weightsGrid.add(boldWeightLineBtn);
 
-        JButton otherWeightLineBtn = new JButton("?");
         otherWeightLineBtn.setBackground(new Color(255, 255, 255));
         otherWeightLineBtn.setToolTipText("Set your own line weight.");
         setDimensionBtn(otherWeightLineBtn, weightBtnSize);
@@ -116,11 +291,18 @@ public class ToolBarMenu extends JToolBar {
             if (weight >= 1) {
                 selectedSettings.setWeight(weight);
             }
+            pressOtherBoldBtn();
         });
         weightsGrid.add(otherWeightLineBtn);
 
         this.add(weightsGrid);
         this.addSeparator();
+
+        currentColorBtn = new JButton("");
+        setDimensionBtn(currentColorBtn, new Dimension(40, 40));
+        currentColorBtn.setBackground(new Color(0, 0, 0));
+        currentColorBtn.setToolTipText("Current color");
+        this.add(currentColorBtn);
 
         // Панель для цветовых кнопок
         JPanel colorsGrid = new JPanel();
@@ -133,21 +315,25 @@ public class ToolBarMenu extends JToolBar {
         // Черный цвет
         JButton blackBtn = createColorButton(new Color(0, 0, 0));
         blackBtn.setToolTipText("Black color. RGB=(0,0,0)");
+        blackBtn.addActionListener(e -> frameWork.setBlackMenuItemSelected(true));
         row1.add(blackBtn);
 
         // Красный цвет
         JButton redBtn = createColorButton(new Color(255, 0, 0));
         redBtn.setToolTipText("Red color. RGB=(255,0,0)");
+        redBtn.addActionListener(e -> frameWork.setRedMenuItemSelected(true));
         row1.add(redBtn);
 
         // Желтый цвет
         JButton redGreenBtn = createColorButton(new Color(255, 255, 0));
         redGreenBtn.setToolTipText("Yellow color. RGB=(255,255,0)");
+        redGreenBtn.addActionListener(e -> frameWork.setYellowMenuItemSelected(true));
         row1.add(redGreenBtn);
 
         // Зеленый цвет
         JButton greenBtn = createColorButton(new Color(0, 255, 0));
         greenBtn.setToolTipText("Green color. RGB=(0,255,0)");
+        greenBtn.addActionListener(e -> frameWork.setGreenMenuItemSelected(true));
         row1.add(greenBtn);
 
         // Второй ряд цветов
@@ -157,21 +343,25 @@ public class ToolBarMenu extends JToolBar {
         // Голубой цвет
         JButton greenBlueBtn = createColorButton(new Color(0, 255, 255));
         greenBlueBtn.setToolTipText("Azure color. RGB=(0,255,255)");
+        greenBlueBtn.addActionListener(e -> frameWork.setLaureateMenuItemSelected(true));
         row2.add(greenBlueBtn);
 
         // Синий цвет
         JButton blueBtn = createColorButton(new Color(0, 0, 255));
         blueBtn.setToolTipText("Blue color. RGB=(0,0,255)");
+        blueBtn.addActionListener(e -> frameWork.setBlueMenuItemSelected(true));
         row2.add(blueBtn);
 
         // Пурпурный цвет
         JButton redBlueBtn = createColorButton(new Color(255, 0, 255));
         redBlueBtn.setToolTipText("Purple color. RGB=(255,0,255)");
+        redBlueBtn.addActionListener(e -> frameWork.setPurpleMenuItemSelected(true));
         row2.add(redBlueBtn);
 
         // Белый цвет
         JButton whiteBtn = createColorButton(new Color(255, 255, 255));
         whiteBtn.setToolTipText("White color. RGB=(255,255,255)");
+        whiteBtn.addActionListener(e -> frameWork.setWhiteMenuItemSelected(true));
         row2.add(whiteBtn);
 
         // Добавляем ряды в сетку
@@ -193,10 +383,11 @@ public class ToolBarMenu extends JToolBar {
                         colorSelectBtn.getBackground()
                 );
 
-                // Если пользователь выбрал цвет (не нажал "Cancel")
                 if (selectedColor != null) {
+                    frameWork.setOtherMenuItemSelected(true);
                     colorSelectBtn.setBackground(selectedColor);
-                    selectedSettings.setCurrentColor(selectedColor); // Обновляем цвет в ColorHolder
+                    currentColorBtn.setBackground(selectedColor);
+                    selectedSettings.setCurrentColor(selectedColor);
                 }
             }
         });
@@ -320,8 +511,107 @@ public class ToolBarMenu extends JToolBar {
         return (selected != null) ? selected : -1;
     }
 
+
+
+    public boolean triangleBtnFlag;
+    public boolean squareBtnFlag;
+    public boolean fiveBtnFlag;
+    public boolean sixBtnFlag;
+    public boolean starBtnFlag;
+    public boolean polygonBtnFlag;
+
+    private JButton triangleBtn;
+    private JButton squareBtn;
+    private JButton fiveBtn;
+    private JButton sixBtn;
+    private JButton starBtn;
+    private JButton polygonBtn;
+
+    private void setAllFigureFlagsFalse() {
+        setAllModesFlagFalse();
+        triangleBtnFlag = false;
+        triangleBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("triangle_icon.jpg"))));
+        squareBtnFlag = false;
+        squareBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("square_icon.jpg"))));
+        fiveBtnFlag = false;
+        fiveBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("five_icon.jpg"))));
+        sixBtnFlag = false;
+        sixBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("six_icon.jpg"))));
+        starBtnFlag = false;
+        starBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("star_icon.jpg"))));
+        polygonBtnFlag = false;
+        polygonBtn.setBackground(new Color(255, 255, 255));
+    }
+
+    public void pressTriangleBtn() {
+        selectedSettings.setFigureMode();
+        setAllFigureFlagsFalse();
+        triangleBtnFlag = true;
+        if (triangleBtnFlag) {
+            triangleBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("pressed/triangle_icon.jpg"))));
+            frameWork.setTriangleMenuItemSelected(true);
+        }
+        else
+            triangleBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("triangle_icon.jpg"))));
+    }
+    public void pressFourBtn() {
+        selectedSettings.setFigureMode();
+        setAllFigureFlagsFalse();
+        squareBtnFlag = true;
+        if (squareBtnFlag) {
+            squareBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("pressed/square_icon.jpg"))));
+            frameWork.setSquareMenuItemSelected(true);
+        }
+        else
+            squareBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("square_icon.jpg"))));
+    }
+    public void pressFiveBtn() {
+        selectedSettings.setFigureMode();
+        setAllFigureFlagsFalse();
+        fiveBtnFlag = true;
+        if (fiveBtnFlag) {
+            fiveBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("pressed/five_icon.jpg"))));
+            frameWork.setSquareMenuItemSelected(true);
+        }
+        else
+            fiveBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("five_icon.jpg"))));
+    }
+    public void pressSixBtn() {
+        selectedSettings.setFigureMode();
+        setAllFigureFlagsFalse();
+        sixBtnFlag = true;
+        if (sixBtnFlag) {
+            sixBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("pressed/six_icon.jpg"))));
+            frameWork.setSquareMenuItemSelected(true);
+        }
+        else
+            sixBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("six_icon.jpg"))));
+    }
+    public void pressStarBtn() {
+        selectedSettings.setFigureMode();
+        setAllFigureFlagsFalse();
+        starBtnFlag = true;
+        if (starBtnFlag) {
+            starBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("pressed/star_icon.jpg"))));
+            frameWork.setSquareMenuItemSelected(true);
+        }
+        else
+            starBtn.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("star_icon.jpg"))));
+    }
+    public void pressPolygonBtn() {
+        selectedSettings.setFigureMode();
+        setAllFigureFlagsFalse();
+        polygonBtnFlag = true;
+        if (polygonBtnFlag) {
+            polygonBtn.setBackground(new Color(200, 200, 200));
+            frameWork.setSquareMenuItemSelected(true);
+        }
+        else
+            polygonBtn.setBackground(new Color(255, 255, 255));
+    }
+
     private void createPatternsGrid(JPanel patternsGrid) {
-        JButton triangleBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("triangle_icon.jpg"))));
+        triangleBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("triangle_icon.jpg"))));
         triangleBtn.setToolTipText("Draw triangle by chosen color and weight.");
         setSizeSquareBtn(triangleBtn, (int)(btnSize*0.85));
         triangleBtn.addActionListener(new ActionListener() {
@@ -331,12 +621,14 @@ public class ToolBarMenu extends JToolBar {
                 int corners = 3;
                 createChosenWindow(corners, "Triangle Settings");
                 selectedSettings.setFigurePatternMode(corners);
-
+                frameWork.setTriangleMenuItemSelected(true);
+                pressTriangleBtn();
             }
         });
+        triangleBtn.addActionListener(e -> pressTriangleBtn());
         patternsGrid.add(triangleBtn);
 
-        JButton squareBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("square_icon.jpg"))));
+        squareBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("square_icon.jpg"))));
         squareBtn.setToolTipText("Draw square by chosen color and weight.");
         setSizeSquareBtn(squareBtn, (int)(btnSize*0.85));
         squareBtn.addActionListener(new ActionListener() {
@@ -345,13 +637,14 @@ public class ToolBarMenu extends JToolBar {
                 int corners = 4;
                 createChosenWindow(corners, "Four corners Settings");
                 selectedSettings.setFigurePatternMode(corners);
-
+                frameWork.setSquareMenuItemSelected(true);
+                pressFourBtn();
             }
         });
         patternsGrid.add(squareBtn);
 
 
-        JButton fiveBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("five_icon.jpg"))));
+        fiveBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("five_icon.jpg"))));
         fiveBtn.setToolTipText("Draw square by chosen color and weight.");
         setSizeSquareBtn(fiveBtn, (int)(btnSize*0.85));
         fiveBtn.addActionListener(new ActionListener() {
@@ -361,12 +654,13 @@ public class ToolBarMenu extends JToolBar {
                 int corners = 5;
                 createChosenWindow(corners, "Five corners Settings");
                 selectedSettings.setFigurePatternMode(corners);
-
+                frameWork.setFivePolygonMenuItemSelected(true);
+                pressFiveBtn();
             }
         });
         patternsGrid.add(fiveBtn);
 
-        JButton sixBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("six_icon.jpg"))));
+        sixBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("six_icon.jpg"))));
         sixBtn.setToolTipText("Draw square by chosen color and weight.");
         setSizeSquareBtn(sixBtn, (int)(btnSize*0.85));
         sixBtn.addActionListener(new ActionListener() {
@@ -376,12 +670,13 @@ public class ToolBarMenu extends JToolBar {
                 int corners = 6;
                 createChosenWindow(corners, "Six corners Settings");
                 selectedSettings.setFigurePatternMode(corners);
-
+                frameWork.setSixPolygonMenuItemSelected(true);
+                pressSixBtn();
             }
         });
         patternsGrid.add(sixBtn);
 
-        JButton starBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("star_icon.jpg"))));
+        starBtn = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("star_icon.jpg"))));
         starBtn.setToolTipText("Draw square by chosen color and weight.");
         setSizeSquareBtn(starBtn, (int)(btnSize*0.85));
         starBtn.addActionListener(new ActionListener() {
@@ -391,12 +686,12 @@ public class ToolBarMenu extends JToolBar {
                 int corners = 6;
                 createChosenWindowForStar(corners, "Star corners Settings");
                 selectedSettings.setFigurePatternMode(corners);
-
+                frameWork.setStarMenuItemSelected(true);
             }
         });
         patternsGrid.add(starBtn);
 
-        JButton polygonBtn = new JButton("Polygon");
+        polygonBtn = new JButton("Polygon");
         polygonBtn.setToolTipText("Draw a polygon with chosen number of corners.");
         setSizeSquareBtn(polygonBtn, (int)(btnSize * 0.85));
         polygonBtn.addActionListener(new ActionListener() {
@@ -407,6 +702,7 @@ public class ToolBarMenu extends JToolBar {
                 if (corners >= 3) {
                     createChosenWindow(corners, "Polygon Settings");
                     selectedSettings.setFigurePatternMode(corners);
+                    frameWork.setOtherPolygonMenuItemSelected(true);
                 }
                 imagePanel.starExampleMode = false;
             }
@@ -582,7 +878,10 @@ public class ToolBarMenu extends JToolBar {
         setDimensionBtn(button, new Dimension(btnSize / 2, btnSize / 2));
         button.setBackground(color);
 
-        button.addActionListener(e -> selectedSettings.setCurrentColor(color));
+        button.addActionListener(e -> {
+            selectedSettings.setCurrentColor(color);
+            currentColorBtn.setBackground(color);
+        });
         return button;
     }
 

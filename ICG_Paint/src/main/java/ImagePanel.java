@@ -49,10 +49,11 @@ public class ImagePanel extends JPanel implements MouseListener {
 		currentImage = new BufferedImage(1000, 700, BufferedImage.TYPE_INT_ARGB);
 	}
 
+
 	public void clear() {
 		if (currentImage != null) {
 			Graphics2D g2d = currentImage.createGraphics();
-			g2d.setColor(Color.lightGray);
+			g2d.setColor(new Color(230, 230, 230));
 			g2d.fillRect(0, 0, currentImage.getWidth(), currentImage.getHeight());
 			g2d.dispose();
 			repaint();
@@ -487,7 +488,7 @@ public class ImagePanel extends JPanel implements MouseListener {
 		int currentY = ev.getY();
 
 		Graphics2D g2d = currentImage.createGraphics();
-		if (selectedSettings.getCurrentWeight() > 1)
+		if (selectedSettings.getCurrentWeight() == 1)
 			bresenhemDrawLine(currentX - DEFAULT_TRIANGLE_SIZE * 2 / 3, currentY + DEFAULT_TRIANGLE_SIZE / 3,
 					currentX, currentY - DEFAULT_TRIANGLE_SIZE * 2 / 3);
 		else
